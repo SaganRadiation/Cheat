@@ -1,3 +1,4 @@
+import logging
 import os
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
@@ -13,3 +14,6 @@ def hello():
 @socketio.on('connect')
 def connect():
   emit('connect_response',  {'data': 'Connected'})
+
+if __name__ == '__main__':
+  socketio.run(app)
