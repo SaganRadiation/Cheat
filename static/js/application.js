@@ -14,5 +14,6 @@ $(document).ready(function(){
   $('form#message_sender').submit(function(event){
     event.preventDefault();
     socket.emit('add message', {data: $('#message_data').val()});
+    $('#message_data').val('');
   })
 })
