@@ -7,17 +7,20 @@ app = Flask(__name__)
 app.debug = 'DEBUG' in os.environ
 socketio = SocketIO(app)
 
+messages = []
+
 @app.route('/')
 def hello():
   return render_template('index.html')
 
 @socketio.on('connect')
 def connect():
-  emit('my response',  {'data': 'Connected'})
+  emit('my response',  {'messages': messages})
 
-@socketio.on('broadcast event')
+@socketio.on('add message')
 def broadcast(message):
-  emit('my response', {'data': message['data']}, broadcast=True)
+  messages.append(message['data'])
+  emit('my response', {'messages': messages}, broadcast=True)
 
 if __name__ == '__main__':
   socketio.run(app)
