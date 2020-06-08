@@ -13,7 +13,11 @@ def hello():
 
 @socketio.on('connect')
 def connect():
-  emit('connect_response',  {'data': 'Connected'})
+  emit('my response',  {'data': 'Connected'})
+
+@socketio.on('broadcast event')
+def broadcast(message):
+  emit('my response', {'data': message['data']}, broadcast=True)
 
 if __name__ == '__main__':
   socketio.run(app)
