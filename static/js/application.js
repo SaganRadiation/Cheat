@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  let socket = io.connect();
+  let socket = io();
 
   socket.on('my response', function(msg){
     $('#log').append('<br>' + $('<div/>').text('Received: ' + msg.data).html());
