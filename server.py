@@ -17,6 +17,19 @@ def hello():
 def connect():
   emit('my response',  {'players': players})
 
+@socketio.on('disconnect')
+def disconnect():
+  request_id = request.sid
+  disconnected_player = False
+  for player in players:
+    if player['id'] == request_id:
+      disconnected_player = True
+      players.remove(player)
+      emit('my message',  "{} has disconnected".format(player['name']), broadcast=True)
+      break
+  if disconnected_player == False:
+    emit('my message',  "No player {} to disconnect. This should never happen.".format(request_id), broadcast=True)
+
 @socketio.on('add name')
 def broadcast(message):
   request_id = request.sid
