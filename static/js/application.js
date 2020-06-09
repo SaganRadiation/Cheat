@@ -11,6 +11,10 @@ $(document).ready(function(){
     $('#log').html(players_formatted);
   })
 
+  socket.on('my message', function(msg){
+    $('#messages').append('<br>' + $('<div/>').text(msg).html());
+  })
+
   $('form#message_sender').submit(function(event){
     event.preventDefault();
     socket.emit('add name', {name: $('#player_name').val()});
