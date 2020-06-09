@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.debug = 'DEBUG' in os.environ
 socketio = SocketIO(app)
 
-sids= []
+players = []
 
 @app.route('/')
 def hello():
@@ -15,12 +15,12 @@ def hello():
 
 @socketio.on('connect')
 def connect():
-  emit('my response',  {'messages': sids})
+  emit('my response',  {'players': players})
 
-@socketio.on('add message')
+@socketio.on('add name')
 def broadcast(message):
-  sids.append(request.sid)
-  emit('my response', {'messages': sids}, broadcast=True)
+  players.append({'id': request.sid, 'name': message['name']})
+  emit('my response', {'players': players}, broadcast=True)
 
 if __name__ == '__main__':
   socketio.run(app)
