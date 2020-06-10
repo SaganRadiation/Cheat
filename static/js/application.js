@@ -63,7 +63,7 @@ let format_card = function(json_card){
     suit_symbol = '♥';
   } else if (suit == 'D'){
     suit_symbol = '♢';
-  } else if (suit == '♤'){
+  } else if (suit == 'S'){
     suit_symbol = '♤';
   } else {
     alert('attempting to format card with invalid suit: ' + suit);

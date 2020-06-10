@@ -1,5 +1,6 @@
 import logging
 import os
+import random
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
@@ -101,6 +102,7 @@ def initialize_deck():
   for card_suit in reversed(CARD_SUITS):
     for card_num in reversed(CARD_NUMS):
       deck.append({'suit': card_suit, 'num': card_num})
+  random.shuffle(deck)
 
 def get_cards_from_deck(n):
   cards_to_return = []
