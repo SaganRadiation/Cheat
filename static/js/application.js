@@ -34,6 +34,11 @@ let update_visibilities = function(){
   }
 }
 
+let update_visuals = function(){
+  update_visibilities();
+   $('#game_status').text(game_status);
+}
+
 $(document).ready(function(){
   let socket = io();
 
@@ -41,17 +46,17 @@ $(document).ready(function(){
 
   socket.on('client initialization', function(msg){
     game_status = msg['game_status'];
-    update_visibilities();
+    update_visuals();
   })
 
   socket.on('game status', function(msg){
     game_status =  msg;
-    update_visibilities();
+    update_visuals();
   })
 
   socket.on('player in game', function(msg){
     player_in_game = msg;
-    update_visibilities();
+    update_visuals();
   })
 
   socket.on('my response', function(msg){
