@@ -7,10 +7,19 @@ app = Flask(__name__)
 app.debug = 'DEBUG' in os.environ
 socketio = SocketIO(app)
 
+## Connection / meta variables
 players = []
 game_status = 'OFF'
+
+# Game parameters
 MINIMUM_PLAYER_COUNT = 2
 MAXIMUM_PLAYER_COUNT = 10
+NUM_CARDS_TO_DEAL = 5
+CARD_SUITS = ('C', 'H', 'D', 'S')
+CARD_NUMS = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
+
+# Game variables
+deck = list()
 
 @app.route('/')
 def hello():
@@ -86,14 +95,27 @@ def change_game_status(message):
     else:
       emit('my message',  "The game is already OFF.")
 
+def initialize_deck():
+  global deck
+  deck = []
+  for card_suit in reversed(CARD_SUITS):
+    for card_num in reversed(CARD_NUMS):
+      deck.append({'suit': card_suit, 'num': card_num})
+
+def get_cards_from_deck(n):
+  cards_to_return = []
+  for _ in range(n):
+    if len(deck) == 0:
+      return cards_to_return
+    cards_to_return.append(deck.pop())
+  return cards_to_return
+
 def start_game():
   emit('my message',  "Starting game.", broadcast=True)
-  for i, player in enumerate(players):
+  initialize_deck()
+  for player in players:
     player_id = player['id']
-    if i == 0:
-      cards = [{'suit': 'C', 'num': 5}, {'suit': 'C', 'num': 6}, {'suit': 'H', 'num': 7}]
-    else:
-      cards = [{'suit': 'D', 'num': 4}, {'suit': 'D', 'num': 2}, {'suit': 'D', 'num': 3}]
+    cards = get_cards_from_deck(NUM_CARDS_TO_DEAL)
     emit('deal cards', {'cards': cards}, room=player_id)
 
 if __name__ == '__main__':
