@@ -18,10 +18,13 @@ MAXIMUM_PLAYER_COUNT = 10
 NUM_CARDS_TO_DEAL = 5
 CARD_SUITS = ('C', 'H', 'D', 'S')
 CARD_NUMS = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
+# Disable this one for real gameplay:
+SHOW_DISCARDS = True
 
 # Game variables
 deck = list()
 active_player_index = 0
+discard_pile = list()
 
 @app.route('/')
 def hello():
@@ -108,9 +111,14 @@ def increment_player_turn():
   annotate_active_player()
 
 @socketio.on('take turn')
-def take_turn():
+def take_turn(msg):
+  emit('my message',  "Took a turn.", broadcast=True)
+  cards = msg['cards']
+  discard_pile.extend(cards)
   increment_player_turn()
   emit('my response', {'players': players}, broadcast=True)
+  if SHOW_DISCARDS:
+    emit('discard pile', {'discard': discard_pile}, broadcast=True)
 
 def initialize_deck():
   global deck

@@ -6,6 +6,7 @@ let player_is_active = 'false';
 let player_name = 'Chrysanthemum';
 let players_array = [];
 let cards = [];
+let discard_pile = [];
 
 let initialize = function(){
   $('form#start_game').hide();
@@ -161,11 +162,21 @@ let show_player_list = function(){
   $('#log').html(players_formatted);
 }
 
+let show_discard_pile = function(){
+  if (discard_pile.length == 0){
+    $('#discard').html('');
+    return;
+  }
+  let formatted_cards = discard_pile.join(', ');
+  $('#discard').html('<i>Discard pile:</i><br>' + formatted_cards + '<br>');
+}
+
 let update_visuals = function(){
   update_visibilities();
   update_texts();
   show_player_list();
   show_cards();
+  show_discard_pile();
 }
 
 let update_active_player = function(){
@@ -180,6 +191,7 @@ let update_active_player = function(){
 let reset_defaults = function(){
   player_is_active = 'false';
   cards = [];
+  discard_pile = [];
 }
 
 $(document).ready(function(){
@@ -216,6 +228,11 @@ $(document).ready(function(){
     update_visuals();
   })
 
+  socket.on('discard pile', function(msg){
+    discard_pile = msg['discard']
+    update_visuals();
+  })
+
   socket.on('my response', function(msg){
     players_array = msg.players;
     update_active_player();
@@ -247,7 +264,10 @@ $(document).ready(function(){
   })
 
   $('form#actions').submit(function(event){
-    event.preventDefault();
-    socket.emit('take turn');
+    let cards_to_send = [];
+    $("#cards_to_play input:checkbox:checked").each(function() {
+      cards_to_send.push($(this).val());
+    });
+    socket.emit('take turn', {'cards': cards_to_send});
   })
 })
