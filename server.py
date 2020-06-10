@@ -8,6 +8,7 @@ app.debug = 'DEBUG' in os.environ
 socketio = SocketIO(app)
 
 players = []
+game_status = 'OFF'
 
 @app.route('/')
 def hello():
@@ -42,7 +43,19 @@ def add_player(message):
 
 @socketio.on('game status')
 def change_game_status(message):
-  emit('my message',  "Changing game status! Value: {}".format(message), broadcast=True)
+  global game_status
+  if message == 'start':
+    if game_status == 'OFF':
+      game_status = 'ON'
+      emit('my message',  "The game is now ON.", broadcast=True)
+    else:
+      emit('my message',  "The game is already ON.")
+  if message == 'end':
+    if game_status == 'ON':
+      game_status = 'OFF'
+      emit('my message',  "The game is now OFF.", broadcast=True)
+    else:
+      emit('my message',  "The game is already OFF.")
 
 if __name__ == '__main__':
   socketio.run(app)
