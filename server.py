@@ -42,8 +42,6 @@ def disconnect():
       players.remove(player)
       emit('my message',  "{} has disconnected".format(player['name']), broadcast=True)
       break
-  if disconnected_player == False:
-    emit('my message',  "No player {} to disconnect. This should never happen.".format(request_id), broadcast=True)
 
 @socketio.on('add name')
 def add_player(message):
