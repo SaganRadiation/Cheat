@@ -31,7 +31,7 @@ def disconnect():
     emit('my message',  "No player {} to disconnect. This should never happen.".format(request_id), broadcast=True)
 
 @socketio.on('add name')
-def broadcast(message):
+def add_player(message):
   request_id = request.sid
   for player in players:
     if player['id'] == request_id:
@@ -39,6 +39,10 @@ def broadcast(message):
       return
   players.append({'id': request.sid, 'name': message['name']})
   emit('my response', {'players': players}, broadcast=True)
+
+@socketio.on('game status')
+def change_game_status(message):
+  emit('my message',  "Changing game status! Value: {}".format(message), broadcast=True)
 
 if __name__ == '__main__':
   socketio.run(app)

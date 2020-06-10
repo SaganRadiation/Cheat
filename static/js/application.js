@@ -15,6 +15,16 @@ $(document).ready(function(){
     $('#messages').append('<br>' + $('<div/>').text(msg).html());
   })
 
+  $('form#start_game').submit(function(event){
+    event.preventDefault();
+    socket.emit('game status', 'start'); 
+  })
+
+  $('form#end_game').submit(function(event){
+    event.preventDefault();
+    socket.emit('game status', 'end'); 
+  })
+
   $('form#message_sender').submit(function(event){
     event.preventDefault();
     socket.emit('add name', {name: $('#player_name').val()});
