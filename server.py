@@ -10,6 +10,7 @@ socketio = SocketIO(app)
 players = []
 game_status = 'OFF'
 MINIMUM_PLAYER_COUNT = 2
+MAXIMUM_PLAYER_COUNT = 10
 
 @app.route('/')
 def hello():
@@ -35,6 +36,9 @@ def disconnect():
 
 @socketio.on('add name')
 def add_player(message):
+  if len(players) == MAXIMUM_PLAYER_COUNT :
+    emit('my message', 'Sorry, maximum number of players is {}.'.format(MAXIMUM_PLAYER_COUNT))
+    return
   if message['name'] == '':
     emit('my message', "Please don't enter a blank name.")
     return
