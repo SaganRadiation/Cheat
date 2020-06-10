@@ -264,8 +264,9 @@ $(document).ready(function(){
   })
 
   $('form#actions').submit(function(event){
+    event.preventDefault();
     let cards_to_send = [];
-    $("#cards_to_play input:checkbox:checked").each(function() {
+    $("#cards_to_play input:checkbox:checked").each(function(index) {
       cards_to_send.push($(this).val());
     });
     socket.emit('take turn', {'cards': cards_to_send});

@@ -112,7 +112,6 @@ def increment_player_turn():
 
 @socketio.on('take turn')
 def take_turn(msg):
-  emit('my message',  "Took a turn.", broadcast=True)
   cards = msg['cards']
   discard_pile.extend(cards)
   increment_player_turn()
