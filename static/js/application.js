@@ -1,28 +1,36 @@
 // Global variables.
 let game_status = 'UNKNOWN'
-let player_in_game = false;
+let player_in_game = 'false';
 
 let initialize = function(){
   $('form#start_game').hide();
+  $('form#leave_game').hide();
   $('form#end_game').hide();
 }
 
 let update_visibilities = function(){
-  if (player_in_game){
+  if (player_in_game == 'true' && game_status == 'ON'){
     $('form#message_sender').hide();
-  } else {
-    $('form#message_sender').show();
-  }
-  if (game_status == 'ON'){
     $('form#start_game').hide();
     $('form#end_game').show();
-  } else if (game_status == 'OFF'){
+    $('form#leave_game').hide();
+  } else if (player_in_game == 'true' && game_status == 'OFF'){
+    $('form#message_sender').hide();
+    $('form#start_game').show();
     $('form#end_game').hide();
-    if (player_in_game){
-      $('form#start_game').show();
-    } else {
-      $('form#start_game').hide();
-    }
+    $('form#leave_game').show();   
+  } else if (player_in_game == 'false' && game_status == 'ON'){
+    $('form#message_sender').hide();
+    $('form#start_game').hide();
+    $('form#end_game').show();
+    $('form#leave_game').hide(); 
+  } else if (player_in_game == 'false' && game_status == 'OFF'){
+    $('form#message_sender').show();
+    $('form#start_game').hide();
+    $('form#end_game').hide();
+    $('form#leave_game').hide();
+  } else{
+    alert ('invalid state reached in update_visibilities');
   }
 }
 
@@ -70,9 +78,13 @@ $(document).ready(function(){
     socket.emit('game status', 'end'); 
   })
 
+  $('form#leave_game').submit(function(event){
+    event.preventDefault();
+    socket.emit('leave game');
+  })
+
   $('form#message_sender').submit(function(event){
     event.preventDefault();
     socket.emit('add name', {name: $('#player_name').val()});
-    $('#player_name').val('');
   })
 })
