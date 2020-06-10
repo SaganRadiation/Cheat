@@ -227,4 +227,9 @@ $(document).ready(function(){
     event.preventDefault();
     socket.emit('add name', {name: $('#player_name').val()});
   })
+
+  $('form#actions').submit(function(event){
+    event.preventDefault();
+    socket.emit('take turn');
+  })
 })

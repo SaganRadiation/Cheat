@@ -95,6 +95,25 @@ def change_game_status(message):
     else:
       emit('my message',  "The game is already OFF.")
 
+def annotate_active_player():
+  for i, player in enumerate(players):
+    if i == active_player_index:
+      player['active'] = 'true'
+    else:
+      player['active'] = 'false'
+
+def increment_player_turn():
+  global active_player_index
+  active_player_index += 1
+  if active_player_index == len(players):
+    active_player_index = 0
+  annotate_active_player()
+
+@socketio.on('take turn')
+def take_turn():
+  increment_player_turn()
+  emit('my response', {'players': players}, broadcast=True)
+
 def initialize_deck():
   global deck
   deck = []
@@ -117,14 +136,11 @@ def start_game():
   initialize_deck()
   global active_player_index
   active_player_index = 0
-  for i, player in enumerate(players):
+  for player in players:
     player_id = player['id']
     cards = get_cards_from_deck(NUM_CARDS_TO_DEAL)
     emit('deal cards', {'cards': cards}, room=player_id)
-    if i == active_player_index:
-      player['active'] = 'true'
-    else:
-      player['active'] = 'false'
+  annotate_active_player()
   emit('my response', {'players': players}, broadcast=True)
 
 def end_game():
