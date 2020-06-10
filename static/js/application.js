@@ -8,6 +8,11 @@ let initialize = function(){
 }
 
 let update_visibilities = function(){
+  if (player_in_game){
+    $('form#message_sender').hide();
+  } else {
+    $('form#message_sender').show();
+  }
   if (game_status == 'ON'){
     $('form#start_game').hide();
     $('form#end_game').show();
