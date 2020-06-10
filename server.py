@@ -34,6 +34,9 @@ def disconnect():
 
 @socketio.on('add name')
 def add_player(message):
+  if message['name'] == '':
+    emit('my message', "Please don't enter a blank name.")
+    return
   request_id = request.sid
   for player in players:
     if player['id'] == request_id:
