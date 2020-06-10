@@ -2,6 +2,7 @@
 let game_status = 'UNKNOWN'
 let player_in_game = 'false';
 let player_name = 'Chrysanthemum';
+let players_array = [];
 let cards = [];
 
 let initialize = function(){
@@ -127,9 +128,23 @@ let show_cards = function(){
   $('#cards').html('Your hand is: ' + formatted_cards + '<br>');
 }
 
+let show_player_list = function(){
+  let players_formatted = '';
+  for (index = 0; index < players_array.length; index++){
+    let name_i = players_array[index]['name'];
+    let formatted_i = $('<div/>').text(name_i).html();
+    if (players_array[index]['active'] == 'true'){
+      formatted_i = '<b>' + formatted_i + '</b> ⭠ Active Player'
+    }
+    players_formatted = players_formatted.concat('<br>' + formatted_i);
+  }
+  $('#log').html(players_formatted);
+}
+
 let update_visuals = function(){
   update_visibilities();
   update_texts();
+  show_player_list();
   show_cards();
 }
 
@@ -161,17 +176,8 @@ $(document).ready(function(){
   })
 
   socket.on('my response', function(msg){
-    let players_formatted = '';
-    let players_array = msg.players;
-    for (index = 0; index < players_array.length; index++){
-      let name_i = players_array[index]['name'];
-      let formatted_i = $('<div/>').text(name_i).html();
-      if (players_array[index]['active'] == 'true'){
-        formatted_i = '<b>' + formatted_i + '</b> ⭠ Active Player'
-      }
-      players_formatted = players_formatted.concat('<br>' + formatted_i);
-    }
-    $('#log').html(players_formatted);
+    players_array = msg.players;
+    update_visuals();
   })
 
   socket.on('my message', function(msg){
