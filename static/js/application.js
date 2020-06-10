@@ -1,6 +1,8 @@
 // Global variables.
 let game_status = 'UNKNOWN'
+let player_id = 'unknown';
 let player_in_game = 'false';
+let player_is_active = 'false';
 let player_name = 'Chrysanthemum';
 let players_array = [];
 let cards = [];
@@ -148,10 +150,24 @@ let update_visuals = function(){
   show_cards();
 }
 
+let update_active_player = function(){
+  player_is_active = 'false';
+  for (index = 0; index < players_array.length; index++){
+    if(players_array[index]['id'] == player_id && players_array[index]['active'] == 'true'){
+      alert('I am now the active player!');
+      player_is_active = 'true'; 
+    }
+  }
+}
+
 $(document).ready(function(){
   let socket = io();
 
   initialize();
+
+  socket.on('connect', function(msg){
+    player_id = socket.id
+  })
 
   socket.on('client initialization', function(msg){
     game_status = msg['game_status'];
@@ -177,6 +193,7 @@ $(document).ready(function(){
 
   socket.on('my response', function(msg){
     players_array = msg.players;
+    update_active_player();
     update_visuals();
   })
 
