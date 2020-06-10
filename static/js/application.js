@@ -42,7 +42,7 @@ let update_texts = function(){
    $('#game_status').text(game_status);
    let player_status_text = '';
    if (player_in_game == 'true'){
-    player_status_text = 'You are in the game as: <b>' + player_name + '</b>'
+    player_status_text = 'You are in the game as: ' + player_name
    } else {
     player_status_text = 'You are not in the game.'
    }
