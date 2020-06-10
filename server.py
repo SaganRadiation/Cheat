@@ -41,6 +41,7 @@ def add_player(message):
       return
   players.append({'id': request.sid, 'name': message['name']})
   emit('my response', {'players': players}, broadcast=True)
+  emit('player in game', 'true')
 
 @socketio.on('game status')
 def change_game_status(message):

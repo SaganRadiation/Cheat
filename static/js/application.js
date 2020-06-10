@@ -1,5 +1,6 @@
 // Global variables.
 let game_status = 'UNKNOWN'
+let player_in_game = false;
 
 let initialize = function(){
   $('form#start_game').hide();
@@ -7,14 +8,16 @@ let initialize = function(){
 }
 
 let update_visibilities = function(){
-  alert('updating visibilities')
-  alert(game_status)
   if (game_status == 'ON'){
     $('form#start_game').hide();
     $('form#end_game').show();
   } else if (game_status == 'OFF'){
     $('form#end_game').hide();
-    $('form#start_game').show();
+    if (player_in_game){
+      $('form#start_game').show();
+    } else {
+      $('form#start_game').hide();
+    }
   }
 }
 
@@ -29,9 +32,12 @@ $(document).ready(function(){
   })
 
   socket.on('game status', function(msg){
-    alert('switching game status')
-    alert(msg)
     game_status =  msg;
+    update_visibilities();
+  })
+
+  socket.on('player in game', function(msg){
+    player_in_game = msg;
     update_visibilities();
   })
 
