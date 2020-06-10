@@ -165,7 +165,11 @@ $(document).ready(function(){
     let players_array = msg.players;
     for (index = 0; index < players_array.length; index++){
       let name_i = players_array[index]['name'];
-      players_formatted = players_formatted.concat('<br>' + $('<div/>').text(name_i).html());
+      let formatted_i = $('<div/>').text(name_i).html();
+      if (players_array[index]['active'] == 'true'){
+        formatted_i = '<b>' + formatted_i + '</b> ⭠ Active Player'
+      }
+      players_formatted = players_formatted.concat('<br>' + formatted_i);
     }
     $('#log').html(players_formatted);
   })

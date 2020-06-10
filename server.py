@@ -21,6 +21,7 @@ CARD_NUMS = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
 
 # Game variables
 deck = list()
+active_player_index = 0
 
 @app.route('/')
 def hello():
@@ -57,7 +58,7 @@ def add_player(message):
     if player['id'] == request_id:
       emit('my message', 'You are already here as ' + player['name'])
       return
-  players.append({'id': request.sid, 'name': message['name']})
+  players.append({'id': request.sid, 'name': message['name'], 'active': 'false'})
   emit('my response', {'players': players}, broadcast=True)
   emit('my message', 'You have joined the game.')
   emit('player status', {'player_in_game': 'true', 'name': message['name']})
@@ -83,8 +84,6 @@ def change_game_status(message):
         emit('my message',  '{} players are needed to start.'.format(MINIMUM_PLAYER_COUNT))
         return
       game_status = 'ON'
-      emit('my message',  "The game is now ON.", broadcast=True)
-      emit('game status', game_status, broadcast=True)
       start_game()
     else:
       emit('my message',  "The game is already ON.")
@@ -92,7 +91,7 @@ def change_game_status(message):
     if game_status == 'ON':
       game_status = 'OFF'
       emit('my message',  "The game is now OFF.", broadcast=True)
-      emit('game status', game_status, broadcast=True)
+      end_game()
     else:
       emit('my message',  "The game is already OFF.")
 
@@ -114,11 +113,25 @@ def get_cards_from_deck(n):
 
 def start_game():
   emit('my message',  "Starting game.", broadcast=True)
+  emit('game status', game_status, broadcast=True)
   initialize_deck()
-  for player in players:
+  global active_player_index
+  active_player_index = 0
+  for i, player in enumerate(players):
     player_id = player['id']
     cards = get_cards_from_deck(NUM_CARDS_TO_DEAL)
     emit('deal cards', {'cards': cards}, room=player_id)
+    if i == active_player_index:
+      player['active'] = 'true'
+    else:
+      player['active'] = 'false'
+  emit('my response', {'players': players}, broadcast=True)
+
+def end_game():
+  for i, player in enumerate(players):
+    player['active'] = 'false'
+  emit('my response', {'players': players}, broadcast=True)
+  emit('game status', game_status, broadcast=True)
 
 if __name__ == '__main__':
   socketio.run(app)
