@@ -1,26 +1,38 @@
+// Global variables.
+let game_status = 'UNKNOWN'
+
+let initialize = function(){
+  $('form#start_game').hide();
+  $('form#end_game').hide();
+}
+
+let update_visibilities = function(){
+  alert('updating visibilities')
+  alert(game_status)
+  if (game_status == 'ON'){
+    $('form#start_game').hide();
+    $('form#end_game').show();
+  } else if (game_status == 'OFF'){
+    $('form#end_game').hide();
+    $('form#start_game').show();
+  }
+}
+
 $(document).ready(function(){
   let socket = io();
-  //let game_state = 'UNKNOWN'
-  //$('form#start_game').hide();
-  //$('form#end_game').hide();
+
+  initialize();
 
   socket.on('client initialization', function(msg){
     game_status = msg['game_status'];
-    if (game_status == 'ON'){
-      $('form#start_game').hide();
-    } else if (game_status == 'OFF'){
-      $('form#end_game').hide();
-    }
+    update_visibilities();
   })
 
   socket.on('game status', function(msg){
-    if (msg == 'ON'){
-      $('form#start_game').hide();
-      $('form#end_game').show();
-    } else if (msg == 'OFF'){
-      $('form#end_game').hide();
-      $('form#start_game').show();
-    }
+    alert('switching game status')
+    alert(msg)
+    game_status =  msg;
+    update_visibilities();
   })
 
   socket.on('my response', function(msg){
