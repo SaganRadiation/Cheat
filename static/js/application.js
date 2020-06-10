@@ -54,10 +54,29 @@ let update_texts = function(){
   }
 }
 
-let show_cards = function(){
-  if (cards.length >0){
-    $('#cards').html('TODO: Show  the cards.<br>');
+let format_card = function(json_card){
+  let suit = json_card['suit'];
+  let suit_symbol = '';
+  if (suit == 'C'){
+    suit_symbol = '♧';
+  } else if (suit == 'H'){
+    suit_symbol = '♥';
+  } else if (suit == 'D'){
+    suit_symbol = '♢';
+  } else if (suit == '♤'){
+    suit_symbol = '♤';
+  } else {
+    alert('attempting to format card with invalid suit: ' + suit);
   }
+  return json_card['num'] + suit_symbol;
+}
+
+let show_cards = function(){
+  if (cards.length == 0){ 
+    return;
+  }
+  let formatted_cards = cards.map(format_card).join(', ');
+  $('#cards').html('Your hand is: ' + formatted_cards + '<br>');
 }
 
 let update_visuals = function(){
