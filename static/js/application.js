@@ -2,6 +2,7 @@
 let game_status = 'UNKNOWN'
 let player_in_game = 'false';
 let player_name = 'Chrysanthemum';
+let cards = [];
 
 let initialize = function(){
   $('form#start_game').hide();
@@ -52,9 +53,17 @@ let update_texts = function(){
     $('#list_of_players').text('Players:');
   }
 }
+
+let show_cards = function(){
+  if (cards.length >0){
+    $('#cards').html('TODO: Show  the cards.<br>');
+  }
+}
+
 let update_visuals = function(){
   update_visibilities();
   update_texts();
+  show_cards();
 }
 
 $(document).ready(function(){
@@ -75,6 +84,11 @@ $(document).ready(function(){
   socket.on('player status', function(msg){
     player_in_game = msg['player_in_game'];
     player_name = msg['name'];
+    update_visuals();
+  })
+
+  socket.on('deal cards', function(msg){
+    cards = msg['cards']
     update_visuals();
   })
 

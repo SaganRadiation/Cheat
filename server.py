@@ -75,6 +75,7 @@ def change_game_status(message):
       game_status = 'ON'
       emit('my message',  "The game is now ON.", broadcast=True)
       emit('game status', game_status, broadcast=True)
+      start_game()
     else:
       emit('my message',  "The game is already ON.")
   if message == 'end':
@@ -84,6 +85,16 @@ def change_game_status(message):
       emit('game status', game_status, broadcast=True)
     else:
       emit('my message',  "The game is already OFF.")
+
+def start_game():
+  emit('my message',  "Starting game.", broadcast=True)
+  for i, player in enumerate(players):
+    player_id = player['id']
+    if i == 0:
+      cards = [{'suit': 'C', 'num': 5}, {'suit': 'C', 'num': 6}, {'suit': 'H', 'num': 7}]
+    else:
+      cards = [{'suit': 'D', 'num': 4}, {'suit': 'D', 'num': 2}, {'suit': 'D', 'num': 3}]
+    emit('deal cards', {'cards': cards}, room=player_id)
 
 if __name__ == '__main__':
   socketio.run(app)
