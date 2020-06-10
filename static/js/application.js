@@ -129,6 +129,7 @@ let sort_cards = function(){
 
 let show_cards = function(){
   if (cards.length == 0){ 
+    $('#cards').html('');
     return;
   }
   let formatted_cards = cards.map(format_card).join(', ');
@@ -148,9 +149,6 @@ let show_player_list = function(){
   $('#log').html(players_formatted);
 }
 
-let show_possible_actions= function(){
-
-}
 let update_visuals = function(){
   update_visibilities();
   update_texts();
@@ -165,6 +163,11 @@ let update_active_player = function(){
       player_is_active = 'true'; 
     }
   }
+}
+
+let reset_defaults = function(){
+  player_is_active = 'false';
+  cards = [];
 }
 
 $(document).ready(function(){
@@ -183,6 +186,9 @@ $(document).ready(function(){
 
   socket.on('game status', function(msg){
     game_status =  msg;
+    if (game_status == 'OFF'){
+      reset_defaults();
+    }
     update_visuals();
   })
 
