@@ -71,6 +71,54 @@ let format_card = function(json_card){
   return json_card['num'] + suit_symbol;
 }
 
+let suit_priority = {
+  'S': 0,
+  'C': 1,
+  'D': 2,
+  'H': 3
+}
+
+let num_priority = {
+  '2': 2,
+  '3': 3,
+  '4': 4,
+  '5': 5,
+  '6': 6,
+  '7': 7,
+  '8': 8,
+  '9': 9,
+  '10': 10,
+  'J': 11,
+  'Q': 12,
+  'K': 13,
+  'A': 14
+}
+
+let compare_cards = function(a, b){
+  a_suit_priority = suit_priority[a['suit']]
+  b_suit_priority = suit_priority[b['suit']]
+  a_num_priority = num_priority[a['num']]
+  b_num_priority = num_priority[b['num']]
+  if (a_num_priority > b_num_priority){
+    return 1;
+  }
+  if (a_num_priority < b_num_priority){
+    return -1;
+  }
+  if (a_suit_priority > b_suit_priority){
+    return 1;
+  }
+  if (a_suit_priority < b_suit_priority){
+    return -1;
+  }
+  alert('compare_cards failure')
+  return 0;
+}
+
+let sort_cards = function(){
+  cards.sort(compare_cards)
+}
+
 let show_cards = function(){
   if (cards.length == 0){ 
     return;
@@ -108,6 +156,7 @@ $(document).ready(function(){
 
   socket.on('deal cards', function(msg){
     cards = msg['cards']
+    sort_cards();
     update_visuals();
   })
 
