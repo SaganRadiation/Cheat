@@ -39,6 +39,11 @@ let update_visibilities = function(){
   } else{
     alert ('invalid state reached in update_visibilities');
   }
+  if (player_in_game == 'true' && player_is_active=='true'){
+    $('form#actions').show();
+  } else {
+    $('form#actions').hide();
+  }
 }
 
 let update_texts = function(){
@@ -143,6 +148,9 @@ let show_player_list = function(){
   $('#log').html(players_formatted);
 }
 
+let show_possible_actions= function(){
+
+}
 let update_visuals = function(){
   update_visibilities();
   update_texts();
@@ -154,7 +162,6 @@ let update_active_player = function(){
   player_is_active = 'false';
   for (index = 0; index < players_array.length; index++){
     if(players_array[index]['id'] == player_id && players_array[index]['active'] == 'true'){
-      alert('I am now the active player!');
       player_is_active = 'true'; 
     }
   }
