@@ -16,6 +16,7 @@ def hello():
 
 @socketio.on('connect')
 def connect():
+  emit('client initialization', {'game_status': game_status})
   emit('my response',  {'players': players})
 
 @socketio.on('disconnect')
@@ -48,12 +49,14 @@ def change_game_status(message):
     if game_status == 'OFF':
       game_status = 'ON'
       emit('my message',  "The game is now ON.", broadcast=True)
+      emit('game status', game_status)
     else:
       emit('my message',  "The game is already ON.")
   if message == 'end':
     if game_status == 'ON':
       game_status = 'OFF'
       emit('my message',  "The game is now OFF.", broadcast=True)
+      emit('game status', game_status)
     else:
       emit('my message',  "The game is already OFF.")
 

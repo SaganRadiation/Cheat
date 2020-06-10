@@ -1,5 +1,27 @@
 $(document).ready(function(){
   let socket = io();
+  //let game_state = 'UNKNOWN'
+  //$('form#start_game').hide();
+  //$('form#end_game').hide();
+
+  socket.on('client initialization', function(msg){
+    game_status = msg['game_status'];
+    if (game_status == 'ON'){
+      $('form#start_game').hide();
+    } else if (game_status == 'OFF'){
+      $('form#end_game').hide();
+    }
+  })
+
+  socket.on('game status', function(msg){
+    if (msg == 'ON'){
+      $('form#start_game').hide();
+      $('form#end_game').show();
+    } else if (msg == 'OFF'){
+      $('form#end_game').hide();
+      $('form#start_game').show();
+    }
+  })
 
   socket.on('my response', function(msg){
     let players_formatted = '';
