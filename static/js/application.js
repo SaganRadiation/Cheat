@@ -168,7 +168,7 @@ let show_discard_pile = function(){
     return;
   }
   let formatted_cards = discard_pile.join(', ');
-  $('#discard').html('<i>Discard pile:</i><br>' + formatted_cards + '<br>');
+  $('#discard').html('<br><i>Discard pile:</i><br>' + formatted_cards + '<br>');
 }
 
 let update_visuals = function(){
