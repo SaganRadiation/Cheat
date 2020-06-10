@@ -9,6 +9,7 @@ socketio = SocketIO(app)
 
 players = []
 game_status = 'OFF'
+MINIMUM_PLAYER_COUNT = 2
 
 @app.route('/')
 def hello():
@@ -54,7 +55,7 @@ def leave_game():
     if player['id'] == request_id:
       players.remove(player)
       emit('my message', 'You have left the game.')
-      emit('player status', {'player_in_game': 'true', 'name': 'none'})
+      emit('player status', {'player_in_game': 'false', 'name': 'none'})
       emit('my response', {'players': players}, broadcast=True)
       return
   emit('my response', 'You are not here. This should never happen.')
@@ -64,6 +65,9 @@ def change_game_status(message):
   global game_status
   if message == 'start':
     if game_status == 'OFF':
+      if len(players) < MINIMUM_PLAYER_COUNT :
+        emit('my message',  '{} players are needed to start.'.format(MINIMUM_PLAYER_COUNT))
+        return
       game_status = 'ON'
       emit('my message',  "The game is now ON.", broadcast=True)
       emit('game status', game_status, broadcast=True)
