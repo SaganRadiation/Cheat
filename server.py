@@ -45,7 +45,7 @@ def add_player(message):
   players.append({'id': request.sid, 'name': message['name']})
   emit('my response', {'players': players}, broadcast=True)
   emit('my message', 'You have joined the game.')
-  emit('player in game', 'true')
+  emit('player status', {'player_in_game': 'true', 'name': message['name']})
 
 @socketio.on('leave game')
 def leave_game():
@@ -54,7 +54,7 @@ def leave_game():
     if player['id'] == request_id:
       players.remove(player)
       emit('my message', 'You have left the game.')
-      emit('player in game', 'false')
+      emit('player status', {'player_in_game': 'true', 'name': 'none'})
       emit('my response', {'players': players}, broadcast=True)
       return
   emit('my response', 'You are not here. This should never happen.')
