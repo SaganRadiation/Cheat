@@ -14,6 +14,7 @@ let update_visibilities = function(){
     $('form#message_sender').hide();
     $('form#start_game').hide();
     $('form#end_game').show();
+    $('#end_game_button').val('End Game');
     $('form#leave_game').hide();
   } else if (player_in_game == 'true' && game_status == 'OFF'){
     $('form#message_sender').hide();
@@ -24,6 +25,7 @@ let update_visibilities = function(){
     $('form#message_sender').hide();
     $('form#start_game').hide();
     $('form#end_game').show();
+    $('#end_game_button').val('End Game for Other Players (you monster)');
     $('form#leave_game').hide(); 
   } else if (player_in_game == 'false' && game_status == 'OFF'){
     $('form#message_sender').show();
