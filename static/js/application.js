@@ -45,9 +45,9 @@ let update_texts = function(){
    }
   $('#player_status').html(player_status_text);
   if (game_status == 'OFF'){
-    $('#list_of_players').text('Ready to play:');
+    $('#list_of_players').text('Players:');
   } else if (game_status == 'ON'){
-    $('#list_of_players').text('Players in game:');
+    $('#list_of_players').text('Players:');
   }
 }
 let update_visuals = function(){
