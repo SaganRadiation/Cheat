@@ -35,8 +35,7 @@ let update_visibilities = function(){
   }
 }
 
-let update_visuals = function(){
-  update_visibilities();
+let update_texts = function(){
    $('#game_status').text(game_status);
    let player_status_text = '';
    if (player_in_game == 'true'){
@@ -45,6 +44,15 @@ let update_visuals = function(){
     player_status_text = 'You are not in the game.'
    }
   $('#player_status').html(player_status_text);
+  if (game_status == 'OFF'){
+    $('#list_of_players').text('Ready to play:');
+  } else if (game_status == 'ON'){
+    $('#list_of_players').text('Players in game:');
+  }
+}
+let update_visuals = function(){
+  update_visibilities();
+  update_texts();
 }
 
 $(document).ready(function(){
