@@ -13,7 +13,7 @@ players = []
 game_status = 'OFF'
 
 # Game parameters
-MINIMUM_PLAYER_COUNT = 2
+MINIMUM_PLAYER_COUNT = 1
 MAXIMUM_PLAYER_COUNT = 10
 NUM_CARDS_TO_DEAL = 5
 CARD_SUITS = ('C', 'H', 'D', 'S')
