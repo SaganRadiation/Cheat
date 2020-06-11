@@ -155,6 +155,13 @@ def get_cards_from_deck(n):
     cards_to_return.append(deck.pop())
   return cards_to_return
 
+def deal_out_entire_deck(player_count):
+  hands = [[] for _ in range(player_count)]
+  for i, card in enumerate(deck):
+    hands[i%player_count].append(card)
+  deck.clear()
+  return hands
+
 def start_game():
   global game_status
   game_status = 'ON'
@@ -163,10 +170,10 @@ def start_game():
   initialize_deck()
   global active_player_index
   active_player_index = 0
-  for player in players:
+  hands = deal_out_entire_deck(len(players))
+  for i, player in enumerate(players):
     player_id = player['id']
-    cards = get_cards_from_deck(NUM_CARDS_TO_DEAL)
-    emit('deal cards', {'cards': cards}, room=player_id)
+    emit('deal cards', {'cards': hands[i]}, room=player_id)
   annotate_active_player()
   emit('my response', {'players': players}, broadcast=True)
 
