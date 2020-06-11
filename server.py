@@ -200,6 +200,9 @@ def is_cheating():
       return True
   return False
 
+def update_player_card_count(player, num):
+  player['card_count'] += num
+
 @socketio.on('take turn')
 def take_turn(msg):
   cards = msg['cards']
@@ -216,6 +219,8 @@ def take_turn(msg):
     emit('cheatable message', take_turn_message(request.sid, len(cards)), broadcast=True, include_self=False)
     emit('important message', take_turn_message(request.sid, len(cards)))
  
+  update_player_card_count(get_player_by_id(request.sid), -len(cards))
+
   increment_player_turn()
   increment_card_sequence()
 
@@ -233,6 +238,7 @@ def punish_player(player):
   global discard_pile
   cards = [deformat_card(card) for card in discard_pile]
   emit('add extra cards', {'cards': cards}, room=player['id'])
+  update_player_card_count(player, len(cards))
   discard_pile = []
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
@@ -263,6 +269,8 @@ def cheater():
   else:
     player_to_punish = challenger
   punish_player(player_to_punish)
+  # Update UI's with card counts.
+  emit('my response', {'players': players}, broadcast=True)
   if maybe_game_over == 'false':
     emit('important message', get_cheater_message(challenger, is_cheating()), broadcast=True)
     return
