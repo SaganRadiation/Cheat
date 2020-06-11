@@ -33,7 +33,6 @@ let populate_card_submission_form = function(){
 
 let update_visibilities = function(){
   if (player_win == 'true' && player_in_game=='true'){
-    $('#player_win').show();
     $('form#message_sender').hide();
     $('form#start_game').show();
     $('#start_game_button').val('Play Again');
@@ -44,7 +43,6 @@ let update_visibilities = function(){
     return;
   } 
   if (player_win == 'true' && player_in_game=='false'){
-    $('#player_win').show();
     $('form#message_sender').show();
     $('form#start_game').hide();
     $('form#end_game').hide();
@@ -53,7 +51,6 @@ let update_visibilities = function(){
     $('form#actions').hide();
     return;
   } 
-  $('#player_win').hide();
   $('form#start_game').val('Start Game');
   if (player_in_game == 'true' && game_status == 'ON'){
     $('form#message_sender').hide();
@@ -104,9 +101,6 @@ let update_texts = function(){
     $('#list_of_players').text('Players:');
   } else if (game_status == 'ON'){
     $('#list_of_players').text('Players:');
-  }
-  if (player_win == 'true'){
-    $('#player_win').html('<b>' + winning_player + '</b> won the game!')
   }
 }
 
@@ -180,7 +174,7 @@ let show_cards = function(){
     return;
   }
   let formatted_cards = cards.map(format_card).join(', ');
-  $('#cards').html('Your hand is: ' + formatted_cards + '<br>');
+  $('#cards').html('<br>Your hand is: ' + formatted_cards + '<br>');
 }
 
 let show_player_list = function(){
