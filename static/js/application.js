@@ -287,6 +287,12 @@ $(document).ready(function(){
     update_visuals();
   })
 
+  socket.on('add extra cards', function(msg){
+    cards = cards.concat(msg['cards']);
+    sort_cards();
+    update_visuals();
+  })
+
   socket.on('discard pile', function(msg){
     discard_pile = msg['discard']
     update_visuals();

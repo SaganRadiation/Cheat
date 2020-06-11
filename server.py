@@ -218,12 +218,19 @@ def take_turn(msg):
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
 
+def punish_player(player):
+  global discard_pile
+  cards = [deformat_card(card) for card in discard_pile]
+  emit('add extra cards', {'cards': cards}, room=player['id'])
+  discard_pile = []
+
 @socketio.on('cheater')
 def cheater():
   if is_cheating():
     player_to_punish = players[get_previous_player_index()]
   else:
     player_to_punish = get_player_by_id(request.sid)
+  punish_player(player_to_punish)
   emit('important message', '{} called Cheater! They were {}. {} will be punished.'.format(
     get_name(request.sid),
     (lambda x: 'right' if x else 'wrong')(is_cheating()),
