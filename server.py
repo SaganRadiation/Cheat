@@ -243,20 +243,20 @@ def punish_player(player):
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
 
-def get_cheater_message(challenger, is_cheating):
-  challenge_outcome = ''
+def get_cheater_message(challenger, is_cheating, discard_pile_size):
   if is_cheating:
-    challenge_outcome = 'The cheater will be punished.'
+    punishee_name = 'The cheater'
   else:
-    challenge_outcome = '{} loses the challenge.'.format(challenger['name'])
+    punishee_name = challenger['name']
 
-  return '{} called Cheater! The cards were: {}. {}'.format(
+  return '{} called Cheater!<br>The cards were: {}.<br>{} picks up {} cards.'.format(
     challenger['name'],
     ', '.join(last_cards_played),
-    challenge_outcome)
+    punishee_name,
+    discard_pile_size)
 
 def get_win_message(challenger):
-  return '{} called Cheater! The cards were: {}.<br><b>{}</b> won the game!'.format(
+  return '{} called Cheater!<br>The cards were: {}.<br><b>{}</b> won the game!'.format(
     challenger['name'],
     ', '.join(last_cards_played),
     players[get_previous_player_index()]['name'])
@@ -268,16 +268,17 @@ def cheater():
     player_to_punish = players[get_previous_player_index()]
   else:
     player_to_punish = challenger
+  discard_pile_size = len(discard_pile)
   punish_player(player_to_punish)
   # Update UI's with card counts.
   emit('my response', {'players': players}, broadcast=True)
   if maybe_game_over == 'false':
-    emit('important message', get_cheater_message(challenger, is_cheating()), broadcast=True)
+    emit('important message', get_cheater_message(challenger, is_cheating(), discard_pile_size), broadcast=True)
     return
   # Possible end game.
   emit('maybe game over', 'false', broadcast=True)
   if is_cheating():
-    emit('important message', get_cheater_message(challenger, True), broadcast=True)
+    emit('important message', get_cheater_message(challenger, True, discard_pile_size), broadcast=True)
     return 
   # End game.
   emit('important message', get_win_message(challenger), broadcast=True)
