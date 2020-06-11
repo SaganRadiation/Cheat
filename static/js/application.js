@@ -7,6 +7,8 @@ let player_name = 'Chrysanthemum';
 let players_array = [];
 let cards = [];
 let discard_pile = [];
+let player_win = 'false';
+let winning_player = 'Billy Bob Thornton';
 
 let initialize = function(){
   $('form#start_game').hide();
@@ -26,6 +28,11 @@ let populate_card_submission_form = function(){
 }
 
 let update_visibilities = function(){
+  if (player_win == 'false'){
+    $('#player_win').hide();
+  } else {
+    $('#player_win').show();
+  }
   if (player_in_game == 'true' && game_status == 'ON'){
     $('form#message_sender').hide();
     $('form#start_game').hide();
@@ -74,6 +81,9 @@ let update_texts = function(){
     $('#list_of_players').text('Players:');
   } else if (game_status == 'ON'){
     $('#list_of_players').text('Players:');
+  }
+  if (player_win == 'true'){
+    $('#player_win').html('<b>' + winning_player + '</b> won the game!')
   }
 }
 
@@ -264,6 +274,12 @@ $(document).ready(function(){
     $('#messages').append('<br>' + $('<div/>').text(msg).html());
   })
 
+  socket.on('player win', function(msg){
+    player_win = 'true';
+    winning_player = msg['player'];
+    update_visuals();
+  })
+
   $('form#start_game').submit(function(event){
     event.preventDefault();
     socket.emit('game status', 'start'); 
@@ -296,6 +312,10 @@ $(document).ready(function(){
       cards_to_send.push($(this).val());
     });
     remove_cards_from_hand(cards_to_send);
-    socket.emit('take turn', {'cards': cards_to_send});
+    let i_won = 'false';
+    if (cards.length == 0){
+      i_won = 'true';
+    }
+    socket.emit('take turn', {'cards': cards_to_send, 'i_won': i_won});
   })
 })

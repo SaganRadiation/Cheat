@@ -120,11 +120,26 @@ def increment_player_turn():
     active_player_index = 0
   annotate_active_player()
 
+def clear_player_turn():
+  global active_player_index
+  active_player_index = -1
+  annotate_active_player()
+
+def get_name(player_id):
+  for player in players:
+    if player['id'] == player_id:
+      return player['name']
+  return 'UNKNOWN'
+
 @socketio.on('take turn')
 def take_turn(msg):
   cards = msg['cards']
   discard_pile.extend(cards)
-  increment_player_turn()
+  if msg['i_won'] == 'true':
+    clear_player_turn()
+    emit('player win', {'player': get_name(request.sid)}, broadcast=True)
+  else:
+    increment_player_turn()
   emit('my response', {'players': players}, broadcast=True)
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
