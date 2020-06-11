@@ -14,7 +14,7 @@ game_status = 'OFF'
 maybe_game_over = 'false'
 
 # Game parameters
-MINIMUM_PLAYER_COUNT = 2
+MINIMUM_PLAYER_COUNT = 1
 MAXIMUM_PLAYER_COUNT = 8
 CARD_SUITS = ('C', 'H', 'D', 'S')
 CARD_NUMS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K')
@@ -206,6 +206,10 @@ def update_player_card_count(player, num):
 @socketio.on('take turn')
 def take_turn(msg):
   cards = msg['cards']
+  if len(cards) == 0:
+    emit('important message', 'You must play at least one card.')
+    return
+    
   discard_pile.extend(cards)
   global last_cards_played
   last_cards_played = cards
