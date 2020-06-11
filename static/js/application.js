@@ -189,7 +189,11 @@ let show_player_list = function(){
   let players_formatted = [];
   for (index = 0; index < players_array.length; index++){
     let name_i = players_array[index]['name'];
-    let formatted_i = $('<div/>').text(name_i).html();
+    let with_cards_i = name_i;
+    if (game_status == 'ON'){
+      with_cards_i = with_cards_i + ' (' + players_array[index]['card_count'] + ')';
+    }
+    let formatted_i = $('<div/>').text(with_cards_i).html();
     if (players_array[index]['active'] == 'true' && maybe_game_over == 'false'){
       formatted_i = '<b>' + formatted_i + '</b> ⭠ Active Player'
     }

@@ -344,6 +344,7 @@ def start_game():
   for i, player in enumerate(players):
     player_id = player['id']
     emit('deal cards', {'cards': hands[i]}, room=player_id)
+    player['card_count'] = len(hands[i])
   annotate_active_player()
   emit('my response', {'players': players, 'card_num': card_sequence}, broadcast=True)
   emit('important message',get_start_game_message(len(players)), broadcast=True)
@@ -352,6 +353,7 @@ def end_game():
   set_game_off_values()
   for i, player in enumerate(players):
     player['active'] = 'false'
+    player['card_count'] = -1
   emit('my response', {'players': players}, broadcast=True)
   emit('game status', game_status, broadcast=True)
 
