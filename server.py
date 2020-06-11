@@ -249,24 +249,30 @@ def deal_out_entire_deck(player_count):
   deck.clear()
   return hands
 
+def get_start_game_message(player_count):
+  message = 'Started game.'
+  deck_count = get_deck_count(player_count)
+  if deck_count  > 1:
+    message = 'Started game, using {} decks.'.format(deck_count)
+  active_player_name = players[active_player_index]['name']
+  message += " It is {}'s turn.".format(active_player_name)
+  return message
+
 def start_game():
-  global game_status, card_sequence
+  global game_status, card_sequence, active_player_index
   game_status = 'ON'
   card_sequence = 'A'
-  start_game_message = 'Starting game.'
-  if get_deck_count(len(players)) > 1:
-    start_game_message = 'Starting game, using {} decks.'.format(get_deck_count(len(players)))
-  emit('important message',  start_game_message, broadcast=True)
+  active_player_index = 0
   emit('game status', game_status, broadcast=True)
   initialize_deck(len(players))
-  global active_player_index
-  active_player_index = 0
+
   hands = deal_out_entire_deck(len(players))
   for i, player in enumerate(players):
     player_id = player['id']
     emit('deal cards', {'cards': hands[i]}, room=player_id)
   annotate_active_player()
   emit('my response', {'players': players, 'card_num': card_sequence}, broadcast=True)
+  emit('important message',get_start_game_message(len(players)), broadcast=True)
 
 def end_game():
   global game_status
