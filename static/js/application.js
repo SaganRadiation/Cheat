@@ -363,4 +363,9 @@ $(document).ready(function(){
     }
     socket.emit('take turn', {'cards': cards_to_send, 'i_won': i_won});
   })
+
+  $('form#cheater').submit(function(event){
+    event.preventDefault();
+    socket.emit('cheater');
+  })
 })

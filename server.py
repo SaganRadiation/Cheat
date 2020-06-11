@@ -206,6 +206,12 @@ def take_turn(msg):
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
 
+@socketio.on('cheater')
+def cheater():
+  emit('important message', '{} called Cheater! They were {}.'.format(
+    get_name(request.sid),
+    (lambda x: 'right' if x else 'wrong')(is_cheating())))
+
 def get_deck_count(player_count):
   if player_count > 4:
     return 2
@@ -217,7 +223,10 @@ def initialize_deck(player_count):
   if TINY_DECK:
     deck.extend([{'suit': 'S', 'num': 'A'},
                  {'suit': 'C', 'num': 'A'},
-                 {'suit': 'D', 'num': 'A'}])
+                 {'suit': 'D', 'num': 'A'},
+                 {'suit': 'H', 'num': 'A'},
+                 {'suit': 'S', 'num': '2'},
+                 {'suit': 'C', 'num': '2'}])
     return
   for _ in range(get_deck_count(player_count)):
     for card_suit in reversed(CARD_SUITS):
