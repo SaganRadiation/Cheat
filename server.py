@@ -17,8 +17,9 @@ MINIMUM_PLAYER_COUNT = 1
 MAXIMUM_PLAYER_COUNT = 10
 CARD_SUITS = ('C', 'H', 'D', 'S')
 CARD_NUMS = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
-# Disable this one for real gameplay:
+# Debug flags. These should all be False for real gameplay.
 SHOW_DISCARDS = False
+TINY_DECK = True
 
 # Game variables
 deck = list()
@@ -146,6 +147,11 @@ def get_deck_count(player_count):
 def initialize_deck(player_count):
   global deck
   deck = []
+  if TINY_DECK:
+    deck.extend([{'suit': 'S', 'num': 'A'},
+                 {'suit': 'C', 'num': 'A'},
+                 {'suit': 'D', 'num': 'A'}])
+    return
   for _ in range(get_deck_count(player_count)):
     for card_suit in reversed(CARD_SUITS):
       for card_num in reversed(CARD_NUMS):
