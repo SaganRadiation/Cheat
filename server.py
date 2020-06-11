@@ -19,7 +19,7 @@ NUM_CARDS_TO_DEAL = 5
 CARD_SUITS = ('C', 'H', 'D', 'S')
 CARD_NUMS = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
 # Disable this one for real gameplay:
-SHOW_DISCARDS = True
+SHOW_DISCARDS = False
 
 # Game variables
 deck = list()
