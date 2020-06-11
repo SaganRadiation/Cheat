@@ -184,16 +184,16 @@ let show_cards = function(){
 }
 
 let show_player_list = function(){
-  let players_formatted = '';
+  let players_formatted = [];
   for (index = 0; index < players_array.length; index++){
     let name_i = players_array[index]['name'];
     let formatted_i = $('<div/>').text(name_i).html();
     if (players_array[index]['active'] == 'true'){
       formatted_i = '<b>' + formatted_i + '</b> ⭠ Active Player'
     }
-    players_formatted = players_formatted.concat('<br>' + formatted_i);
+    players_formatted.push(formatted_i);
   }
-  $('#log').html(players_formatted);
+  $('#log').html(players_formatted.join('<br>'));
 }
 
 let show_discard_pile = function(){
