@@ -125,6 +125,18 @@ def increment_player_turn():
     active_player_index = 0
   annotate_active_player()
 
+def get_previous_player_index():
+  index = active_player_index - 1
+  if index == -1:
+    index = len(players) - 1
+  return index
+
+def get_player_by_id(player_id):
+  for player in players:
+    if player['id'] == player_id:
+      return player
+  raise Exception("can't get nonexistent player")
+
 def increment_card_sequence():
   global card_sequence
   card_sequence_index = CARD_NUMS.index(card_sequence)
@@ -160,7 +172,7 @@ def get_name(player_id):
   for player in players:
     if player['id'] == player_id:
       return player['name']
-  return 'UNKNOWN'
+  raise Exception("can't get name for nonexistent player")
 
 def wordify(n):
   num_map = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine',
@@ -208,9 +220,14 @@ def take_turn(msg):
 
 @socketio.on('cheater')
 def cheater():
-  emit('important message', '{} called Cheater! They were {}.'.format(
+  if is_cheating():
+    player_to_punish = players[get_previous_player_index()]
+  else:
+    player_to_punish = get_player_by_id(request.sid)
+  emit('important message', '{} called Cheater! They were {}. {} will be punished.'.format(
     get_name(request.sid),
-    (lambda x: 'right' if x else 'wrong')(is_cheating())))
+    (lambda x: 'right' if x else 'wrong')(is_cheating()),
+    player_to_punish['name']))
 
 def get_deck_count(player_count):
   if player_count > 4:
