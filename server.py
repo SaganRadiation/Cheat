@@ -11,6 +11,7 @@ socketio = SocketIO(app)
 ## Connection / meta variables
 players = []
 game_status = 'OFF'
+maybe_game_over = 'false'
 
 # Game parameters
 MINIMUM_PLAYER_COUNT = 1
@@ -186,6 +187,11 @@ def take_turn_message(player_id, card_count):
     card_sequence
     )
 
+def maybe_win_message(player_id, card_count):
+  return '{}<br>{} won the game?!'.format(
+    take_turn_message(player_id, card_count),
+    get_name(player_id))
+
 def is_cheating():
   previous_sequence = get_previous_card_sequence()
   for formatted_card in last_cards_played:
@@ -200,16 +206,21 @@ def take_turn(msg):
   discard_pile.extend(cards)
   global last_cards_played
   last_cards_played = cards
-  emit('cheatable message', take_turn_message(request.sid, len(cards)), broadcast=True, include_self=False)
-  emit('important message', take_turn_message(request.sid, len(cards)))
   if msg['i_won'] == 'true':
-    end_game()
-    emit('player win', {'player': get_name(request.sid)}, broadcast=True)
-    emit('important message', '{} won the game!'.format(get_name(request.sid)), broadcast=True)
+    global maybe_game_over
+    maybe_game_over = 'true'
+    emit('maybe game over', 'true', broadcast=True)
+    emit('cheatable message', maybe_win_message(request.sid, len(cards)), broadcast=True, include_self=False)
+    emit('important message', maybe_win_message(request.sid, len(cards)))
   else:
-    increment_player_turn()
-    increment_card_sequence()
+    emit('cheatable message', take_turn_message(request.sid, len(cards)), broadcast=True, include_self=False)
+    emit('important message', take_turn_message(request.sid, len(cards)))
+ 
+  increment_player_turn()
+  increment_card_sequence()
+
   emit('my response', {'players': players, 'card_num': card_sequence}, broadcast=True)
+
   if OUT_CHEATERS:
     if is_cheating():
       emit('info message', 'The last player was cheating!!!!', broadcast=True)
@@ -225,7 +236,7 @@ def punish_player(player):
   discard_pile = []
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
-    
+
 def get_cheater_message(challenger, is_cheating):
   challenge_outcome = ''
   if is_cheating:
@@ -238,6 +249,12 @@ def get_cheater_message(challenger, is_cheating):
     ', '.join(last_cards_played),
     challenge_outcome)
 
+def get_win_message(challenger):
+  return '{} called Cheater! The cards were: {}.<br><b>{}</b> won the game!'.format(
+    challenger['name'],
+    ', '.join(last_cards_played),
+    players[get_previous_player_index()]['name'])
+
 @socketio.on('cheater')
 def cheater():
   challenger = get_player_by_id(request.sid)
@@ -246,7 +263,18 @@ def cheater():
   else:
     player_to_punish = challenger
   punish_player(player_to_punish)
-  emit('important message', get_cheater_message(challenger, is_cheating()), broadcast=True)
+  if maybe_game_over == 'false':
+    emit('important message', get_cheater_message(challenger, is_cheating()), broadcast=True)
+    return
+  # Possible end game.
+  emit('maybe game over', 'false', broadcast=True)
+  if is_cheating():
+    emit('important message', get_cheater_message(challenger, True), broadcast=True)
+    return 
+  # End game.
+  emit('important message', get_win_message(challenger), broadcast=True)
+  emit('player win', broadcast=True)
+  end_game()
 
 def get_deck_count(player_count):
   if player_count > 4:
@@ -257,10 +285,10 @@ def initialize_deck(player_count):
   global deck
   deck = []
   if TINY_DECK:
-    deck.extend([{'suit': 'S', 'num': 'A'},
-                 {'suit': 'C', 'num': 'A'},
-                 {'suit': 'D', 'num': 'A'},
-                 {'suit': 'H', 'num': 'A'},
+    deck.extend([{'suit': 'S', 'num': '2'},
+                 {'suit': 'C', 'num': '2'},
+                 {'suit': 'D', 'num': '2'},
+                 {'suit': 'H', 'num': '2'},
                  {'suit': 'S', 'num': '2'},
                  {'suit': 'C', 'num': '2'}])
     return
@@ -294,11 +322,21 @@ def get_start_game_message(player_count):
   message += " It is {}'s turn.".format(active_player_name)
   return message
 
-def start_game():
-  global game_status, card_sequence, active_player_index
+def set_game_start_values():
+  global game_status, card_sequence, maybe_game_over, active_player_index
   game_status = 'ON'
   card_sequence = 'A'
+  maybe_game_over = 'false'
   active_player_index = 0
+
+def set_game_off_values():
+  global game_status, discard_pile
+  game_status = 'OFF'
+  maybe_game_over = 'false'
+  discard_pile = []
+
+def start_game():
+  set_game_start_values()
   emit('game status', game_status, broadcast=True)
   initialize_deck(len(players))
 
@@ -311,8 +349,7 @@ def start_game():
   emit('important message',get_start_game_message(len(players)), broadcast=True)
 
 def end_game():
-  global game_status
-  game_status = 'OFF'
+  set_game_off_values()
   for i, player in enumerate(players):
     player['active'] = 'false'
   emit('my response', {'players': players}, broadcast=True)

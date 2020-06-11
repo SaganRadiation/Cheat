@@ -1,5 +1,6 @@
 // Global variables.
 let game_status = 'UNKNOWN'
+let maybe_game_over = 'false';
 let player_id = 'unknown';
 let player_in_game = 'false';
 let player_is_active = 'false';
@@ -86,7 +87,7 @@ let update_visibilities = function(){
   } else{
     alert ('invalid state reached in update_visibilities');
   }
-  if (player_in_game == 'true' && player_is_active=='true'){
+  if (player_in_game == 'true' && player_is_active=='true' && maybe_game_over=='false'){
     $('form#actions').show();
     populate_card_submission_form();
   } else {
@@ -189,7 +190,7 @@ let show_player_list = function(){
   for (index = 0; index < players_array.length; index++){
     let name_i = players_array[index]['name'];
     let formatted_i = $('<div/>').text(name_i).html();
-    if (players_array[index]['active'] == 'true'){
+    if (players_array[index]['active'] == 'true' && maybe_game_over == 'false'){
       formatted_i = '<b>' + formatted_i + '</b> ⭠ Active Player'
     }
     players_formatted.push(formatted_i);
@@ -227,10 +228,12 @@ let set_game_off_values = function(){
   player_is_active = 'false';
   cards = [];
   discard_pile = [];
+  maybe_game_over = 'false';
 }
 
 let set_game_start_values = function(){
   player_win = 'false';
+  maybe_game_over = 'false';
 }
 
 let remove_cards_from_hand = function(list_of_formatted_cards){
@@ -249,6 +252,11 @@ let remove_cards_from_hand = function(list_of_formatted_cards){
     }
   }
   cards = new_hand;
+}
+
+let add_msg_to_log = function(msg){
+  msg = msg.replace('<br>',' ');
+  $('#messages').prepend($('<div/>').text(msg).text() + '<br>');
 }
 
 $(document).ready(function(){
@@ -272,6 +280,11 @@ $(document).ready(function(){
     } else{
       set_game_start_values();
     }
+    update_visuals();
+  })
+
+  socket.on('maybe game over', function(msg){
+    maybe_game_over = msg;
     update_visuals();
   })
 
@@ -308,7 +321,7 @@ $(document).ready(function(){
   })
 
   socket.on('info message', function(msg){
-    $('#messages').prepend($('<div/>').text(msg).html() + '<br>');
+    add_msg_to_log(msg);
   })
 
   socket.on('important message', function(msg){
@@ -316,7 +329,7 @@ $(document).ready(function(){
     update_visibilities();
     $('#last_action_info').show();
     $('#last_action').html(msg)
-    $('#messages').prepend($('<div/>').text(msg).html() + '<br>');
+    add_msg_to_log(msg);
   })
 
   socket.on('cheatable message', function(msg){
@@ -324,8 +337,7 @@ $(document).ready(function(){
     update_visibilities();
     $('#last_action_info').show();
     $('#last_action').html(msg)
-    $('#messages').prepend($('<div/>').text(msg).html() + '<br>');
-
+    add_msg_to_log(msg);
   })
 
   socket.on('player win', function(msg){
