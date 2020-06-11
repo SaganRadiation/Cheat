@@ -24,6 +24,7 @@ TINY_DECK = True
 # Game variables
 deck = list()
 active_player_index = 0
+card_sequence = 'UNSET'
 discard_pile = list()
 
 @app.route('/')
@@ -120,6 +121,14 @@ def increment_player_turn():
     active_player_index = 0
   annotate_active_player()
 
+def increment_card_sequence():
+  global card_sequence
+  card_sequence_index = CARD_NUMS.index(card_sequence)
+  card_sequence_index += 1
+  if card_sequence_index == len(CARD_NUMS):
+    card_sequence_index = 0
+  card_sequence = CARD_NUMS[card_sequence_index]
+
 def get_name(player_id):
   for player in players:
     if player['id'] == player_id:
@@ -138,7 +147,8 @@ def take_turn(msg):
     emit('my message', '{} won the game!'.format(get_name(request.sid)), broadcast=True)
   else:
     increment_player_turn()
-  emit('my response', {'players': players}, broadcast=True)
+    increment_card_sequence()
+  emit('my response', {'players': players, 'card_num': card_sequence}, broadcast=True)
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
 
@@ -177,8 +187,9 @@ def deal_out_entire_deck(player_count):
   return hands
 
 def start_game():
-  global game_status
+  global game_status, card_sequence
   game_status = 'ON'
+  card_sequence = 'A'
   start_game_message = 'Starting game.'
   if get_deck_count(len(players)) > 1:
     start_game_message = 'Starting game, using {} decks.'.format(get_deck_count(len(players)))
@@ -192,7 +203,7 @@ def start_game():
     player_id = player['id']
     emit('deal cards', {'cards': hands[i]}, room=player_id)
   annotate_active_player()
-  emit('my response', {'players': players, 'card_num': '3'}, broadcast=True)
+  emit('my response', {'players': players, 'card_num': card_sequence}, broadcast=True)
 
 def end_game():
   global game_status
