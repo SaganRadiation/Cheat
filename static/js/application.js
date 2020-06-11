@@ -131,6 +131,7 @@ let suit_priority = {
 }
 
 let num_priority = {
+  'A': 1,
   '2': 2,
   '3': 3,
   '4': 4,
@@ -143,7 +144,6 @@ let num_priority = {
   'J': 11,
   'Q': 12,
   'K': 13,
-  'A': 14
 }
 
 let compare_cards = function(a, b){
