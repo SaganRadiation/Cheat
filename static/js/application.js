@@ -163,7 +163,6 @@ let compare_cards = function(a, b){
   if (a_suit_priority < b_suit_priority){
     return -1;
   }
-  alert('compare_cards failure')
   return 0;
 }
 

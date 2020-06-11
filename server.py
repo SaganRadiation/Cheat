@@ -15,7 +15,6 @@ game_status = 'OFF'
 # Game parameters
 MINIMUM_PLAYER_COUNT = 1
 MAXIMUM_PLAYER_COUNT = 10
-NUM_CARDS_TO_DEAL = 5
 CARD_SUITS = ('C', 'H', 'D', 'S')
 CARD_NUMS = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
 # Disable this one for real gameplay:
@@ -139,12 +138,18 @@ def take_turn(msg):
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
 
-def initialize_deck():
+def get_deck_count(player_count):
+  if player_count > 4:
+    return 2
+  return 1
+
+def initialize_deck(player_count):
   global deck
   deck = []
-  for card_suit in reversed(CARD_SUITS):
-    for card_num in reversed(CARD_NUMS):
-      deck.append({'suit': card_suit, 'num': card_num})
+  for _ in range(get_deck_count(player_count)):
+    for card_suit in reversed(CARD_SUITS):
+      for card_num in reversed(CARD_NUMS):
+        deck.append({'suit': card_suit, 'num': card_num})
   random.shuffle(deck)
 
 def get_cards_from_deck(n):
@@ -165,9 +170,12 @@ def deal_out_entire_deck(player_count):
 def start_game():
   global game_status
   game_status = 'ON'
-  emit('my message',  "Starting game.", broadcast=True)
+  start_game_message = 'Starting game.'
+  if get_deck_count(len(players)) > 1:
+    start_game_message = 'Starting game, using {} decks.'.format(get_deck_count(len(players)))
+  emit('my message',  start_game_message, broadcast=True)
   emit('game status', game_status, broadcast=True)
-  initialize_deck()
+  initialize_deck(len(players))
   global active_player_index
   active_player_index = 0
   hands = deal_out_entire_deck(len(players))
