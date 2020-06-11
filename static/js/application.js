@@ -3,13 +3,14 @@ let game_status = 'UNKNOWN'
 let player_id = 'unknown';
 let player_in_game = 'false';
 let player_is_active = 'false';
+let first_turn = 'unknown'
 let player_name = 'Chrysanthemum';
 let players_array = [];
 let cards = [];
 let discard_pile = [];
-let player_win = 'false';
-let winning_player = 'Billy Bob Thornton';
+let player_win = 'UNSET';
 let card_num = 'UNSET';
+let cheatable_action = 'false';
 
 let initialize = function(){
   $('form#start_game').hide();
@@ -17,6 +18,7 @@ let initialize = function(){
   $('form#leave_game').hide();
   $('form#end_game').hide();
   $('#last_action_info').hide();
+  $('form#cheater').hide();
 }
 
 let populate_card_submission_form = function(){
@@ -32,6 +34,11 @@ let populate_card_submission_form = function(){
 }
 
 let update_visibilities = function(){
+  if (player_in_game == 'true' && cheatable_action=='true'){
+    $('form#cheater').show();
+  } else{
+    $('form#cheater').hide();
+  }
   if (player_win == 'true' && player_in_game=='true'){
     $('form#message_sender').hide();
     $('form#start_game').show();
@@ -224,7 +231,6 @@ let set_game_off_values = function(){
 
 let set_game_start_values = function(){
   player_win = 'false';
-  winning_player = 'Billy Bob Thornton';
 }
 
 let remove_cards_from_hand = function(list_of_formatted_cards){
@@ -300,14 +306,22 @@ $(document).ready(function(){
   })
 
   socket.on('important message', function(msg){
+    cheatable_action = 'false';
     $('#last_action_info').show();
     $('#last_action').html(msg)
     $('#messages').prepend($('<div/>').text(msg).html() + '<br>');
   })
 
+  socket.on('cheatable message', function(msg){
+    cheatable_action = 'true';
+    $('#last_action_info').show();
+    $('#last_action').html(msg)
+    $('#messages').prepend($('<div/>').text(msg).html() + '<br>');
+
+  })
+
   socket.on('player win', function(msg){
     player_win = 'true';
-    winning_player = msg['player'];
     update_visuals();
   })
 

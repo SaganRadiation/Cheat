@@ -188,6 +188,7 @@ def take_turn(msg):
   discard_pile.extend(cards)
   global last_cards_played
   last_cards_played = cards
+  emit('cheatable message', take_turn_message(request.sid, len(cards)), broadcast=True, include_self=False)
   emit('important message', take_turn_message(request.sid, len(cards)))
   if msg['i_won'] == 'true':
     end_game()
