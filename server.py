@@ -48,25 +48,25 @@ def disconnect():
     if player['id'] == request_id:
       disconnected_player = True
       players.remove(player)
-      emit('my message',  "{} has disconnected".format(player['name']), broadcast=True)
+      emit('info message',  "{} has disconnected".format(player['name']), broadcast=True)
       break
 
 @socketio.on('add name')
 def add_player(message):
   if len(players) == MAXIMUM_PLAYER_COUNT :
-    emit('my message', 'Sorry, maximum number of players is {}.'.format(MAXIMUM_PLAYER_COUNT))
+    emit('important message', 'Sorry, maximum number of players is {}.'.format(MAXIMUM_PLAYER_COUNT))
     return
   if message['name'] == '':
-    emit('my message', "Please don't enter a blank name.")
+    emit('important message', "Please don't enter a blank name.")
     return
   request_id = request.sid
   for player in players:
     if player['id'] == request_id:
-      emit('my message', 'You are already here as ' + player['name'])
+      emit('important message', 'You are already here as ' + player['name'])
       return
   players.append({'id': request.sid, 'name': message['name'], 'active': 'false'})
   emit('my response', {'players': players}, broadcast=True)
-  emit('my message', 'You have joined the game.')
+  emit('important message', 'You have joined the game.')
   emit('player status', {'player_in_game': 'true', 'name': message['name']})
 
 @socketio.on('leave game')
@@ -75,7 +75,7 @@ def leave_game():
   for player in players:
     if player['id'] == request_id:
       players.remove(player)
-      emit('my message', 'You have left the game.')
+      emit('important message', 'You have left the game.')
       emit('player status', {'player_in_game': 'false', 'name': 'none'})
       emit('my response', {'players': players}, broadcast=True)
       return
@@ -87,19 +87,19 @@ def change_game_status(message):
   if message == 'start':
     if game_status == 'OFF':
       if len(players) < MINIMUM_PLAYER_COUNT :
-        emit('my message',  '{} players are needed to start.'.format(MINIMUM_PLAYER_COUNT))
+        emit('important message',  '{} players are needed to start.'.format(MINIMUM_PLAYER_COUNT))
         return
       game_status = 'ON'
       start_game()
     else:
-      emit('my message',  "The game is already ON.")
+      emit('info message',  "The game is already ON.")
   if message == 'end':
     if game_status == 'ON':
       game_status = 'OFF'
-      emit('my message',  "The game is now OFF.", broadcast=True)
+      emit('info message',  "The game is now OFF.", broadcast=True)
       end_game()
     else:
-      emit('my message',  "The game is already OFF.")
+      emit('info message',  "The game is already OFF.")
 
 @socketio.on('end game and kick')
 def end_game_and_kick():
@@ -107,7 +107,7 @@ def end_game_and_kick():
   global players
   game_status = 'OFF'
   players = []
-  emit('my message',  "The game was ended and all players were kicked.", broadcast=True)
+  emit('important message',  "The game was ended and all players were kicked.", broadcast=True)
   end_game()
 
 
@@ -188,20 +188,20 @@ def take_turn(msg):
   discard_pile.extend(cards)
   global last_cards_played
   last_cards_played = cards
-  emit('my message', take_turn_message(request.sid, len(cards)))
+  emit('important message', take_turn_message(request.sid, len(cards)))
   if msg['i_won'] == 'true':
     end_game()
     emit('player win', {'player': get_name(request.sid)}, broadcast=True)
-    emit('my message', '{} won the game!'.format(get_name(request.sid)), broadcast=True)
+    emit('important message', '{} won the game!'.format(get_name(request.sid)), broadcast=True)
   else:
     increment_player_turn()
     increment_card_sequence()
   emit('my response', {'players': players, 'card_num': card_sequence}, broadcast=True)
   if OUT_CHEATERS:
     if is_cheating():
-      emit('my message', 'The last player was cheating!!!!', broadcast=True)
+      emit('info message', 'The last player was cheating!!!!', broadcast=True)
     else:
-      emit('my message', 'The last player is a saint.', broadcast=True)
+      emit('info message', 'The last player is a saint.', broadcast=True)
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
 
@@ -246,7 +246,7 @@ def start_game():
   start_game_message = 'Starting game.'
   if get_deck_count(len(players)) > 1:
     start_game_message = 'Starting game, using {} decks.'.format(get_deck_count(len(players)))
-  emit('my message',  start_game_message, broadcast=True)
+  emit('important message',  start_game_message, broadcast=True)
   emit('game status', game_status, broadcast=True)
   initialize_deck(len(players))
   global active_player_index

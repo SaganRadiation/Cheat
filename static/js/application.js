@@ -13,8 +13,10 @@ let card_num = 'UNSET';
 
 let initialize = function(){
   $('form#start_game').hide();
+  $('form#start_game').hide();
   $('form#leave_game').hide();
   $('form#end_game').hide();
+  $('#last_action_info').hide();
 }
 
 let populate_card_submission_form = function(){
@@ -299,7 +301,13 @@ $(document).ready(function(){
     update_visuals();
   })
 
-  socket.on('my message', function(msg){
+  socket.on('info message', function(msg){
+    $('#messages').append('<br>' + $('<div/>').text(msg).html());
+  })
+
+  socket.on('important message', function(msg){
+    $('#last_action_info').show();
+    $('#last_action').html(msg)
     $('#messages').append('<br>' + $('<div/>').text(msg).html());
   })
 
