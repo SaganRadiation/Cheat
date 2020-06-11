@@ -135,12 +135,24 @@ def get_name(player_id):
       return player['name']
   return 'UNKNOWN'
 
+def wordify(n):
+  num_map = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine',
+             10: 'ten', 11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen'}
+  return num_map.get(n, 'eleventy')
+
+def take_turn_message(player_id, card_count):
+  return '{} played {} {}'.format(
+    get_name(request.sid),
+    wordify(card_count),
+    card_sequence
+    )
+
 @socketio.on('take turn')
 def take_turn(msg):
   cards = msg['cards']
   discard_pile.extend(cards)
-  emit('my message', '{} played {} card{}.'.format(get_name(request.sid), len(cards),
-    (lambda x: '' if x ==1 else 's')(len(cards))))
+
+  emit('my message', take_turn_message(request.sid, len(cards)))
   if msg['i_won'] == 'true':
     end_game()
     emit('player win', {'player': get_name(request.sid)}, broadcast=True)
