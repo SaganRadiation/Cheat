@@ -28,11 +28,29 @@ let populate_card_submission_form = function(){
 }
 
 let update_visibilities = function(){
-  if (player_win == 'false'){
-    $('#player_win').hide();
-  } else {
+  if (player_win == 'true' && player_in_game=='true'){
     $('#player_win').show();
-  }
+    $('form#message_sender').hide();
+    $('form#start_game').show();
+    $('#start_game_button').val('Play Again');
+    $('form#end_game').hide();
+    $('form#end_game_and_kick').hide();
+    $('form#leave_game').show();
+    $('form#actions').hide();
+    return;
+  } 
+  if (player_win == 'true' && player_in_game=='false'){
+    $('#player_win').show();
+    $('form#message_sender').show();
+    $('form#start_game').hide();
+    $('form#end_game').hide();
+    $('form#end_game_and_kick').hide();
+    $('form#leave_game').hide();
+    $('form#actions').hide();
+    return;
+  } 
+  $('#player_win').hide();
+  $('form#start_game').val('Start Game');
   if (player_in_game == 'true' && game_status == 'ON'){
     $('form#message_sender').hide();
     $('form#start_game').hide();
@@ -200,12 +218,16 @@ let update_active_player = function(){
   }
 }
 
-let reset_defaults = function(){
+let set_game_off_values = function(){
   player_is_active = 'false';
   cards = [];
   discard_pile = [];
 }
 
+let set_game_start_values = function(){
+  player_win = 'false';
+  winning_player = 'Billy Bob Thornton';
+}
 
 let remove_cards_from_hand = function(list_of_formatted_cards){
   let new_hand = []
@@ -242,7 +264,9 @@ $(document).ready(function(){
   socket.on('game status', function(msg){
     game_status =  msg;
     if (game_status == 'OFF'){
-      reset_defaults();
+      set_game_off_values();
+    } else{
+      set_game_start_values();
     }
     update_visuals();
   })

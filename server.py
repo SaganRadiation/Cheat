@@ -15,7 +15,7 @@ game_status = 'OFF'
 # Game parameters
 MINIMUM_PLAYER_COUNT = 1
 MAXIMUM_PLAYER_COUNT = 10
-NUM_CARDS_TO_DEAL = 5
+NUM_CARDS_TO_DEAL = 1
 CARD_SUITS = ('C', 'H', 'D', 'S')
 CARD_NUMS = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
 # Disable this one for real gameplay:
@@ -120,11 +120,6 @@ def increment_player_turn():
     active_player_index = 0
   annotate_active_player()
 
-def clear_player_turn():
-  global active_player_index
-  active_player_index = -1
-  annotate_active_player()
-
 def get_name(player_id):
   for player in players:
     if player['id'] == player_id:
@@ -136,7 +131,7 @@ def take_turn(msg):
   cards = msg['cards']
   discard_pile.extend(cards)
   if msg['i_won'] == 'true':
-    clear_player_turn()
+    end_game()
     emit('player win', {'player': get_name(request.sid)}, broadcast=True)
   else:
     increment_player_turn()
@@ -161,6 +156,8 @@ def get_cards_from_deck(n):
   return cards_to_return
 
 def start_game():
+  global game_status
+  game_status = 'ON'
   emit('my message',  "Starting game.", broadcast=True)
   emit('game status', game_status, broadcast=True)
   initialize_deck()
@@ -174,6 +171,8 @@ def start_game():
   emit('my response', {'players': players}, broadcast=True)
 
 def end_game():
+  global game_status
+  game_status = 'OFF'
   for i, player in enumerate(players):
     player['active'] = 'false'
   emit('my response', {'players': players}, broadcast=True)
