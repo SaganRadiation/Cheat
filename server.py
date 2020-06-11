@@ -96,6 +96,16 @@ def change_game_status(message):
     else:
       emit('my message',  "The game is already OFF.")
 
+@socketio.on('end game and kick')
+def end_game_and_kick():
+  global game_status
+  global players
+  game_status = 'OFF'
+  players = []
+  emit('my message',  "The game was ended and all players were kicked.", broadcast=True)
+  end_game()
+
+
 def annotate_active_player():
   for i, player in enumerate(players):
     if i == active_player_index:

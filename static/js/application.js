@@ -30,23 +30,25 @@ let update_visibilities = function(){
     $('form#message_sender').hide();
     $('form#start_game').hide();
     $('form#end_game').show();
-    $('#end_game_button').val('End Game');
+    $('form#end_game_and_kick').hide();
     $('form#leave_game').hide();
   } else if (player_in_game == 'true' && game_status == 'OFF'){
     $('form#message_sender').hide();
     $('form#start_game').show();
     $('form#end_game').hide();
+    $('form#end_game_and_kick').hide();
     $('form#leave_game').show();   
   } else if (player_in_game == 'false' && game_status == 'ON'){
     $('form#message_sender').hide();
     $('form#start_game').hide();
-    $('form#end_game').show();
-    $('#end_game_button').val('End Game for Other Players (you monster)');
+    $('form#end_game').hide();
+    $('form#end_game_and_kick').show();
     $('form#leave_game').hide(); 
   } else if (player_in_game == 'false' && game_status == 'OFF'){
     $('form#message_sender').show();
     $('form#start_game').hide();
     $('form#end_game').hide();
+    $('form#end_game_and_kick').hide();
     $('form#leave_game').hide();
   } else{
     alert ('invalid state reached in update_visibilities');
@@ -251,6 +253,11 @@ $(document).ready(function(){
   $('form#end_game').submit(function(event){
     event.preventDefault();
     socket.emit('game status', 'end'); 
+  })
+
+  $('form#end_game_and_kick').submit(function(event){
+    event.preventDefault();
+    socket.emit('end game and kick'); 
   })
 
   $('form#leave_game').submit(function(event){
