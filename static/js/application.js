@@ -313,6 +313,7 @@ $(document).ready(function(){
 
   socket.on('important message', function(msg){
     cheatable_action = 'false';
+    update_visibilities();
     $('#last_action_info').show();
     $('#last_action').html(msg)
     $('#messages').prepend($('<div/>').text(msg).html() + '<br>');
@@ -320,6 +321,7 @@ $(document).ready(function(){
 
   socket.on('cheatable message', function(msg){
     cheatable_action = 'true';
+    update_visibilities();
     $('#last_action_info').show();
     $('#last_action').html(msg)
     $('#messages').prepend($('<div/>').text(msg).html() + '<br>');

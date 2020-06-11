@@ -223,18 +223,30 @@ def punish_player(player):
   cards = [deformat_card(card) for card in discard_pile]
   emit('add extra cards', {'cards': cards}, room=player['id'])
   discard_pile = []
+  if SHOW_DISCARDS:
+    emit('discard pile', {'discard': discard_pile}, broadcast=True)
+    
+def get_cheater_message(challenger, is_cheating):
+  challenge_outcome = ''
+  if is_cheating:
+    challenge_outcome = 'The cheater will be punished.'
+  else:
+    challenge_outcome = '{} loses the challenge.'.format(challenger['name'])
+
+  return '{} called Cheater! The cards were: {}. {}'.format(
+    challenger['name'],
+    ', '.join(last_cards_played),
+    challenge_outcome)
 
 @socketio.on('cheater')
 def cheater():
+  challenger = get_player_by_id(request.sid)
   if is_cheating():
     player_to_punish = players[get_previous_player_index()]
   else:
-    player_to_punish = get_player_by_id(request.sid)
+    player_to_punish = challenger
   punish_player(player_to_punish)
-  emit('important message', '{} called Cheater! They were {}. {} will be punished.'.format(
-    get_name(request.sid),
-    (lambda x: 'right' if x else 'wrong')(is_cheating()),
-    player_to_punish['name']))
+  emit('important message', get_cheater_message(challenger, is_cheating()), broadcast=True)
 
 def get_deck_count(player_count):
   if player_count > 4:
