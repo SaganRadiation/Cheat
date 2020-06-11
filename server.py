@@ -16,7 +16,7 @@ game_status = 'OFF'
 MINIMUM_PLAYER_COUNT = 1
 MAXIMUM_PLAYER_COUNT = 10
 CARD_SUITS = ('C', 'H', 'D', 'S')
-CARD_NUMS = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
+CARD_NUMS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K')
 # Debug flags. These should all be False for real gameplay.
 SHOW_DISCARDS = False
 TINY_DECK = True
@@ -192,7 +192,7 @@ def start_game():
     player_id = player['id']
     emit('deal cards', {'cards': hands[i]}, room=player_id)
   annotate_active_player()
-  emit('my response', {'players': players}, broadcast=True)
+  emit('my response', {'players': players, 'card_num': '3'}, broadcast=True)
 
 def end_game():
   global game_status

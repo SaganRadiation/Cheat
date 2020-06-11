@@ -9,6 +9,7 @@ let cards = [];
 let discard_pile = [];
 let player_win = 'false';
 let winning_player = 'Billy Bob Thornton';
+let card_num = 'UNSET';
 
 let initialize = function(){
   $('form#start_game').hide();
@@ -89,6 +90,7 @@ let update_visibilities = function(){
 
 let update_texts = function(){
    $('#game_status').text(game_status);
+   $('#card_num').text(card_num);
    let player_status_text = '';
    if (player_in_game == 'true'){
     player_status_text = 'You are in the game as: ' + player_name
@@ -290,6 +292,9 @@ $(document).ready(function(){
 
   socket.on('my response', function(msg){
     players_array = msg.players;
+    if('card_num' in msg){
+      card_num = msg['card_num'];
+    }
     update_active_player();
     update_visuals();
   })
