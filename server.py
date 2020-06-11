@@ -18,14 +18,18 @@ MAXIMUM_PLAYER_COUNT = 10
 CARD_SUITS = ('C', 'H', 'D', 'S')
 CARD_NUMS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K')
 # Debug flags. These should all be False for real gameplay.
-SHOW_DISCARDS = False
+SHOW_DISCARDS = True
 TINY_DECK = True
+OUT_CHEATERS = True
 
 # Game variables
 deck = list()
 active_player_index = 0
 card_sequence = 'UNSET'
+# Discared cards in string format.
 discard_pile = list()
+# Last cards played in string format.
+last_cards_played = list()
 
 @app.route('/')
 def hello():
@@ -129,6 +133,29 @@ def increment_card_sequence():
     card_sequence_index = 0
   card_sequence = CARD_NUMS[card_sequence_index]
 
+def get_previous_card_sequence():
+  card_sequence_index = CARD_NUMS.index(card_sequence)
+  card_sequence_index -= 1
+  if card_sequence_index == -1:
+    card_sequence_index = len(CARD_NUMS) -1
+  return CARD_NUMS[card_sequence_index]
+
+def deformat_card(formatted_card):
+  num = formatted_card[:-1]
+  formatted_suit = formatted_card[-1]
+  deformatted_suit = ''
+  if formatted_suit == '♧':
+    deformatted_suit = 'C'
+  elif formatted_suit == '♥':
+    deformatted_suit = 'H'
+  elif formatted_suit == '♢':
+    deformatted_suit = 'D'
+  elif formatted_suit == '♤':
+    deformatted_suit = 'S'
+  else:
+    raise Exception('error deformatting card: {}'.format(formatted_card))
+  return {'suit': deformatted_suit, 'num': num}
+
 def get_name(player_id):
   for player in players:
     if player['id'] == player_id:
@@ -141,17 +168,26 @@ def wordify(n):
   return num_map.get(n, 'eleventy')
 
 def take_turn_message(player_id, card_count):
-  return '{} played {} {}'.format(
+  return '{} played {} {}.'.format(
     get_name(request.sid),
     wordify(card_count),
     card_sequence
     )
 
+def is_cheating():
+  previous_sequence = get_previous_card_sequence()
+  for formatted_card in last_cards_played:
+    card = deformat_card(formatted_card)
+    if card['num'] != previous_sequence:
+      return True
+  return False
+
 @socketio.on('take turn')
 def take_turn(msg):
   cards = msg['cards']
   discard_pile.extend(cards)
-
+  global last_cards_played
+  last_cards_played = cards
   emit('my message', take_turn_message(request.sid, len(cards)))
   if msg['i_won'] == 'true':
     end_game()
@@ -161,6 +197,11 @@ def take_turn(msg):
     increment_player_turn()
     increment_card_sequence()
   emit('my response', {'players': players, 'card_num': card_sequence}, broadcast=True)
+  if OUT_CHEATERS:
+    if is_cheating():
+      emit('my message', 'The last player was cheating!!!!', broadcast=True)
+    else:
+      emit('my message', 'The last player is a saint.', broadcast=True)
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
 
