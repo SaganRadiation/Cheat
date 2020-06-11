@@ -296,13 +296,13 @@ $(document).ready(function(){
   })
 
   socket.on('info message', function(msg){
-    $('#messages').append('<br>' + $('<div/>').text(msg).html());
+    $('#messages').prepend($('<div/>').text(msg).html() + '<br>');
   })
 
   socket.on('important message', function(msg){
     $('#last_action_info').show();
     $('#last_action').html(msg)
-    $('#messages').append('<br>' + $('<div/>').text(msg).html());
+    $('#messages').prepend($('<div/>').text(msg).html() + '<br>');
   })
 
   socket.on('player win', function(msg){
