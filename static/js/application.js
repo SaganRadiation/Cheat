@@ -241,21 +241,11 @@ let set_game_start_values = function(){
 }
 
 let remove_cards_from_hand = function(list_of_formatted_cards){
-  let new_hand = []
-  for (i = 0; i < cards.length; i++){
-    let card = cards[i];
-    let card_match = false;
-    for (j = 0; j < list_of_formatted_cards.length; j++){
-      let formatted_card = list_of_formatted_cards[j];
-      if (format_card(card) == formatted_card){
-        card_match = true;
-      }
-    }
-    if (card_match == false){
-      new_hand.push(card)
-    }
+  for (i=0; i < list_of_formatted_cards.length; i++){
+    let formatted_card = list_of_formatted_cards[i];
+    let matching_idx = cards.findIndex(x => format_card(x) == formatted_card);
+    cards.splice(matching_idx, 1);
   }
-  cards = new_hand;
 }
 
 let add_msg_to_log = function(msg){
