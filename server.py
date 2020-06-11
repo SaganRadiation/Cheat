@@ -130,9 +130,12 @@ def get_name(player_id):
 def take_turn(msg):
   cards = msg['cards']
   discard_pile.extend(cards)
+  emit('my message', '{} played {} card{}.'.format(get_name(request.sid), len(cards),
+    (lambda x: '' if x ==1 else 's')(len(cards))))
   if msg['i_won'] == 'true':
     end_game()
     emit('player win', {'player': get_name(request.sid)}, broadcast=True)
+    emit('my message', '{} won the game!'.format(get_name(request.sid)), broadcast=True)
   else:
     increment_player_turn()
   emit('my response', {'players': players}, broadcast=True)
