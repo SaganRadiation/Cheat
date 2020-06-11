@@ -196,6 +196,25 @@ let reset_defaults = function(){
   discard_pile = [];
 }
 
+
+let remove_cards_from_hand = function(list_of_formatted_cards){
+  let new_hand = []
+  for (i = 0; i < cards.length; i++){
+    let card = cards[i];
+    let card_match = false;
+    for (j = 0; j < list_of_formatted_cards.length; j++){
+      let formatted_card = list_of_formatted_cards[j];
+      if (format_card(card) == formatted_card){
+        card_match = true;
+      }
+    }
+    if (card_match == false){
+      new_hand.push(card)
+    }
+  }
+  cards = new_hand;
+}
+
 $(document).ready(function(){
   let socket = io();
 
@@ -276,6 +295,7 @@ $(document).ready(function(){
     $("#cards_to_play input:checkbox:checked").each(function(index) {
       cards_to_send.push($(this).val());
     });
+    remove_cards_from_hand(cards_to_send);
     socket.emit('take turn', {'cards': cards_to_send});
   })
 })
