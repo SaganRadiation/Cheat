@@ -21,7 +21,8 @@ let populate_card_submission_form = function(){
   for (i = 0; i < cards.length; i++){
     let card = cards[i];
     card_html = '<input type="checkbox" value="' + format_card(card) + 
-    '"><label>' + format_card(card) + '</label><br>';
+    '" id="card' + i + '"><label for="card' + i  + '">' + format_card(card) + 
+    '</label><br>';
     card_submission_html += card_html;
   }
   $('#cards_to_play').html(card_submission_html);
