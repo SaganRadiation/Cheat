@@ -291,7 +291,7 @@ def cheater():
 
 def get_deck_count(player_count):
   if player_count > 4:
-    return 2
+    return 1
   return 1
 
 def initialize_deck(player_count):
