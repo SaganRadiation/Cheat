@@ -20,7 +20,7 @@ CARD_SUITS = ('C', 'H', 'D', 'S')
 CARD_NUMS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K')
 # Debug flags. These should all be False for real gameplay.
 SHOW_DISCARDS = False
-TINY_DECK = False
+TINY_DECK = True
 OUT_CHEATERS = False
 
 # Game variables
@@ -180,17 +180,17 @@ def wordify(n):
              10: 'ten', 11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen'}
   return num_map.get(n, 'eleventy')
 
-def take_turn_message(player_id, card_count):
+def take_turn_message(player, card_count):
   return '{} played {} {}.'.format(
-    get_name(request.sid),
+    player['name'],
     wordify(card_count),
     card_sequence
     )
 
-def maybe_win_message(player_id, card_count):
+def maybe_win_message(player, card_count):
   return '{}<br>{} won the game?!'.format(
-    take_turn_message(player_id, card_count),
-    get_name(player_id))
+    take_turn_message(player, card_count),
+    player['name'])
 
 def is_cheating():
   previous_sequence = get_previous_card_sequence()
@@ -202,9 +202,12 @@ def is_cheating():
 
 def update_player_card_count(player, num):
   player['card_count'] += num
+  if player['card_count'] < 0:
+    raise Exception('player {} has {} cards.'.format(player['name'], player['card_count']))
 
 @socketio.on('take turn')
 def take_turn(msg):
+  player_taking_turn = get_player_by_id(request.sid)
   cards = msg['cards']
   if len(cards) == 0:
     emit('important message', 'You must play at least one card.')
@@ -213,17 +216,17 @@ def take_turn(msg):
   discard_pile.extend(cards)
   global last_cards_played
   last_cards_played = cards
-  if msg['i_won'] == 'true':
+
+  update_player_card_count(player_taking_turn, -len(cards))
+  if player_taking_turn['card_count'] == 0:
     global maybe_game_over
     maybe_game_over = 'true'
     emit('maybe game over', 'true', broadcast=True)
-    emit('cheatable message', maybe_win_message(request.sid, len(cards)), broadcast=True, include_self=False)
-    emit('important message', maybe_win_message(request.sid, len(cards)))
+    emit('cheatable message', maybe_win_message(player_taking_turn, len(cards)), broadcast=True, include_self=False)
+    emit('important message', maybe_win_message(player_taking_turn, len(cards)))
   else:
-    emit('cheatable message', take_turn_message(request.sid, len(cards)), broadcast=True, include_self=False)
-    emit('important message', take_turn_message(request.sid, len(cards)))
- 
-  update_player_card_count(get_player_by_id(request.sid), -len(cards))
+    emit('cheatable message', take_turn_message(player_taking_turn, len(cards)), broadcast=True, include_self=False)
+    emit('important message', take_turn_message(player_taking_turn, len(cards)))
 
   increment_player_turn()
   increment_card_sequence()

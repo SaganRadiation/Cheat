@@ -371,11 +371,7 @@ $(document).ready(function(){
       cards_to_send.push($(this).val());
     });
     remove_cards_from_hand(cards_to_send);
-    let i_won = 'false';
-    if (cards.length == 0){
-      i_won = 'true';
-    }
-    socket.emit('take turn', {'cards': cards_to_send, 'i_won': i_won});
+    socket.emit('take turn', {'cards': cards_to_send});
   })
 
   $('form#cheater').submit(function(event){
