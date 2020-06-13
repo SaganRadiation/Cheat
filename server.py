@@ -178,7 +178,7 @@ def get_name(player_id):
 def wordify(n):
   num_map = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine',
              10: 'ten', 11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen'}
-  return num_map.get(n, 'eleventy')
+  return num_map.get(n, str(n))
 
 def take_turn_message(player, card_count):
   return '{} played {} {}.'.format(
@@ -250,29 +250,32 @@ def punish_player(player):
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
 
-def get_cheater_message(challenger, is_cheating, discard_pile_size):
+def get_cheater_message(challenger, challengee, is_cheating, discard_pile_size):
   if is_cheating:
     punishee_name = 'The cheater'
   else:
     punishee_name = challenger['name']
 
-  return '{} called Cheater!<br>The cards were: {}.<br>{} picks up {} cards.'.format(
+  return '{} called Cheater on {}!<br>The cards were: {}.<br>{} picks up {} cards.'.format(
     challenger['name'],
+    challengee['name'],
     ', '.join(last_cards_played),
     punishee_name,
     discard_pile_size)
 
-def get_win_message(challenger):
-  return '{} called Cheater!<br>The cards were: {}.<br><b>{}</b> won the game!'.format(
+def get_win_message(challenger, challengee):
+  return '{} called Cheater on {}!<br>The cards were: {}.<br><b>{}</b> won the game!'.format(
     challenger['name'],
+    challengee['name'],
     ', '.join(last_cards_played),
-    players[get_previous_player_index()]['name'])
+    challengee['name'])
 
 @socketio.on('cheater')
 def cheater():
   challenger = get_player_by_id(request.sid)
+  challengee = players[get_previous_player_index()]
   if is_cheating():
-    player_to_punish = players[get_previous_player_index()]
+    player_to_punish = challengee
   else:
     player_to_punish = challenger
   discard_pile_size = len(discard_pile)
@@ -280,15 +283,15 @@ def cheater():
   # Update UI's with card counts.
   emit('my response', {'players': players}, broadcast=True)
   if maybe_game_over == 'false':
-    emit('important message', get_cheater_message(challenger, is_cheating(), discard_pile_size), broadcast=True)
+    emit('important message', get_cheater_message(challenger, challengee, is_cheating(), discard_pile_size), broadcast=True)
     return
   # Possible end game.
   emit('maybe game over', 'false', broadcast=True)
   if is_cheating():
-    emit('important message', get_cheater_message(challenger, True, discard_pile_size), broadcast=True)
+    emit('important message', get_cheater_message(challenger, challengee, True, discard_pile_size), broadcast=True)
     return 
   # End game.
-  emit('important message', get_win_message(challenger), broadcast=True)
+  emit('important message', get_win_message(challenger, challengee), broadcast=True)
   emit('player win', broadcast=True)
   end_game()
 
