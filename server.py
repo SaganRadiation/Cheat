@@ -304,11 +304,11 @@ def initialize_deck(player_count):
   global deck
   deck = []
   if TINY_DECK:
-    deck.extend([{'suit': 'S', 'num': '2'},
+    deck.extend([{'suit': 'S', 'num': 'A'},
                  {'suit': 'C', 'num': '2'},
-                 {'suit': 'D', 'num': '2'},
+                 {'suit': 'D', 'num': 'A'},
                  {'suit': 'H', 'num': '2'},
-                 {'suit': 'S', 'num': '2'},
+                 {'suit': 'S', 'num': 'A'},
                  {'suit': 'C', 'num': '2'}])
     return
   for _ in range(get_deck_count(player_count)):

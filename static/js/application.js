@@ -249,7 +249,7 @@ let remove_cards_from_hand = function(list_of_formatted_cards){
 }
 
 let add_msg_to_log = function(msg){
-  msg = msg.replace('<br>',' ');
+  msg = msg.replace(/<br>/g,' ');
   $('#messages').prepend($('<div/>').text(msg).text() + '<br>');
 }
 
