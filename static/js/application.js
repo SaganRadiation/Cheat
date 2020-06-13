@@ -9,6 +9,7 @@ let player_name = 'Chrysanthemum';
 let players_array = [];
 let cards = [];
 let discard_pile = [];
+let discard_pile_size = -1;
 let player_win = 'UNSET';
 let card_num = 'UNSET';
 let cheatable_action = 'false';
@@ -203,12 +204,18 @@ let show_player_list = function(){
 }
 
 let show_discard_pile = function(){
-  if (discard_pile.length == 0){
+  if (discard_pile_size == -1){
     $('#discard').html('');
     return;
   }
-  let formatted_cards = discard_pile.join(', ');
-  $('#discard').html('<br><i>Discard pile:</i><br>' + formatted_cards + '<br>');
+  let message = '<br><i>Discard pile:</i><br>';
+  if (discard_pile.length > 0){
+    message = message + discard_pile.join(', ');
+  } else{
+    message = message + discard_pile_size + ' cards';
+  }
+  message = message + '<br>';
+  $('#discard').html(message);
 }
 
 let update_visuals = function(){
@@ -232,12 +239,14 @@ let set_game_off_values = function(){
   player_is_active = 'false';
   cards = [];
   discard_pile = [];
+  discard_pile_size = -1;
   maybe_game_over = 'false';
 }
 
 let set_game_start_values = function(){
   player_win = 'false';
   maybe_game_over = 'false';
+  discard_pile_size = 0;
 }
 
 let remove_cards_from_hand = function(list_of_formatted_cards){
@@ -301,7 +310,12 @@ $(document).ready(function(){
   })
 
   socket.on('discard pile', function(msg){
-    discard_pile = msg['discard']
+    if ('discard' in msg){
+      discard_pile = msg['discard']
+    }
+    if ('discard_size' in msg){
+      discard_pile_size = msg['discard_size'];
+    }
     update_visuals();
   })
 

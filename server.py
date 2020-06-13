@@ -19,7 +19,7 @@ MAXIMUM_PLAYER_COUNT = 8
 CARD_SUITS = ('C', 'H', 'D', 'S')
 CARD_NUMS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K')
 # Debug flags. These should all be False for real gameplay.
-SHOW_DISCARDS = False
+SHOW_DISCARDS = True
 TINY_DECK = True
 OUT_CHEATERS = False
 
@@ -240,6 +240,8 @@ def take_turn(msg):
       emit('info message', 'The last player is a saint.', broadcast=True)
   if SHOW_DISCARDS:
     emit('discard pile', {'discard': discard_pile}, broadcast=True)
+  else:
+    emit('discard pile', {'discard_size': len(discard_pile)}, broadcast=True)
 
 def punish_player(player):
   global discard_pile
@@ -280,6 +282,11 @@ def cheater():
     player_to_punish = challenger
   discard_pile_size = len(discard_pile)
   punish_player(player_to_punish)
+  # Update discard pile (should be empty)
+  if SHOW_DISCARDS:
+    emit('discard pile', {'discard': discard_pile}, broadcast=True)
+  else:
+    emit('discard pile', {'discard_size': len(discard_pile)}, broadcast=True)
   # Update UI's with card counts.
   emit('my response', {'players': players}, broadcast=True)
   if maybe_game_over == 'false':
