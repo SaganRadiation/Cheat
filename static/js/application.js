@@ -182,7 +182,7 @@ let show_cards = function(){
     return;
   }
   let formatted_cards = cards.map(format_card).join(', ');
-  $('#cards').html('<br>Your hand is: ' + formatted_cards + '<br>');
+  $('#cards').html('<br><i>Your hand:</i><br>' + formatted_cards + '<br>');
 }
 
 let show_player_list = function(){
@@ -195,7 +195,7 @@ let show_player_list = function(){
     }
     let formatted_i = $('<div/>').text(with_cards_i).html();
     if (players_array[index]['active'] == 'true' && maybe_game_over == 'false'){
-      formatted_i = '<b>' + formatted_i + '</b> ⭠ Active Player'
+      formatted_i = '<b>' + formatted_i + '</b> ⭠ Card to play: ' + card_num;
     }
     players_formatted.push(formatted_i);
   }
