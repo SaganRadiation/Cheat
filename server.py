@@ -19,8 +19,8 @@ MAXIMUM_PLAYER_COUNT = 8
 CARD_SUITS = ('C', 'H', 'D', 'S')
 CARD_NUMS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K')
 # Debug flags. These should all be False for real gameplay.
-SHOW_DISCARDS = True
-TINY_DECK = True
+SHOW_DISCARDS = False
+TINY_DECK = False
 OUT_CHEATERS = False
 
 # Game variables
